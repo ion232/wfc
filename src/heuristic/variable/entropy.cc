@@ -2,6 +2,10 @@
 
 namespace wfc::heuristic::variable {
 
+Entropy::Entropy(std::shared_ptr<Weights> weights)
+    : m_weights(std::move(weights))
+{}
+
 void Entropy::inform(std::size_t index, const Domain& domain) {
     std::ignore = index;
     std::ignore = domain;
@@ -11,10 +15,10 @@ void Entropy::inform(std::size_t index, const Domain& domain) {
     // m_undecided.insert(entry);
 }
 
-std::size_t Entropy::pick_variable() {
-    // if (auto it = m_undecided.begin(); it != m_undecided.end()) {
-    //     return it->first;
-    // }
+std::optional<std::size_t> Entropy::pick_variable() {
+    if (auto it = m_undecided.begin(); it != m_undecided.end()) {
+        return it->first;
+    }
     return 0;
 }
 

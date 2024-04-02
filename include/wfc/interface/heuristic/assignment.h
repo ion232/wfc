@@ -9,6 +9,7 @@ namespace wfc::heuristic::interface {
 
 class Assignment {
 public:
+    virtual ~Assignment() {};
     virtual Id assign(const Domain::Set& ids) = 0;
 };
 

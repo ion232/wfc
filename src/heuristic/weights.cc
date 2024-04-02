@@ -2,11 +2,11 @@
 
 namespace wfc::heuristic {
 
-Weights::Weights(std::unordered_map<Id, float>&& weights)
+Weights::Weights(std::unordered_map<Id, std::size_t>&& weights)
     : m_weights(std::move(weights))
 {}
 
-std::initializer_list<float> Weights::weights(const Domain& domain) {
+std::initializer_list<std::size_t> Weights::weights(const Domain& domain) {
     return {};
 }
 

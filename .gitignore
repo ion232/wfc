@@ -31,4 +31,5 @@
 *.out
 *.app
 
-.build
+.dev
+build

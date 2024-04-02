@@ -27,7 +27,7 @@ std::size_t Random::make_size_t(std::size_t min, std::size_t max) {
 }
 
 float Random::make_float(float min, float max) {
-    auto distribution = std::uniform_int_distribution<float>(min, max);
+    auto distribution = std::uniform_real_distribution<float>(min, max);
     return distribution(m_engine);
 }
 
