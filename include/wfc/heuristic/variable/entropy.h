@@ -3,6 +3,7 @@
 #include "wfc/heuristic/weights.h"
 #include "wfc/interface/heuristic/variable.h"
 
+#include <memory>
 #include <optional>
 #include <set>
 #include <utility>

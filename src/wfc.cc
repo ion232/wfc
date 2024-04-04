@@ -28,7 +28,10 @@ const data::Matrix<Domain>& Wfc::variables() {
 
 void Wfc::observe() {
     auto index = m_config.variable_heuristic->pick_variable();
-    auto& domain = m_variables[index];
+    if (!index) {
+        return;
+    }
+    auto& domain = m_variables[*index];
     auto id = m_config.assignment_heuristic->assign(domain.ids());
     domain.choose(id);
 
