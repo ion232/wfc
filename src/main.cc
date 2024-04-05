@@ -81,7 +81,8 @@ int main() {
         image_height
     );
 
-    auto image = std::make_shared<model::Image>("./assets/images/forest.png");
+    const auto image_path = std::filesystem::path("./assets/images/forest.png");
+    auto image = std::make_shared<model::Image>(std::move(*model::load_image(image_path)));
     auto config = [image](){
         const auto seed = 1337;
         auto random = std::make_shared<io::Random>(seed);

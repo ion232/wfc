@@ -7,9 +7,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(wfc)
 
 include_directories(include)
+include_directories(external/lodepng)
 
 add_subdirectory(src)
 add_subdirectory(external/lodepng)
 add_subdirectory(external/SDL EXCLUDE_FROM_ALL)
 
-target_link_libraries(wfc PRIVATE SDL3::SDL3)
+target_link_libraries(wfc PRIVATE SDL3::SDL3 lodepng)

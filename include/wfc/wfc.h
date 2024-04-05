@@ -26,7 +26,7 @@ private:
     Config m_config;
     data::Matrix<Domain> m_variables;
     std::size_t m_variables_assigned;
-    std::stack<std::size_t> m_propagation_stack;
+    std::stack<std::size_t, std::vector<std::size_t>> m_propagation_stack;
 
 public:
     Wfc(Config&& config, data::Matrix<Domain>&& variables);

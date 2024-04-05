@@ -12,13 +12,18 @@ Matrix<T>::Matrix(std::vector<std::size_t>&& dimensions, T value)
 {}
 
 template<typename T>
-T& Matrix<T>::operator[](std::size_t index) const {
+T& Matrix<T>::operator[](std::size_t index) {
+    return m_data[index];
+}
+
+template<typename T>
+const T& Matrix<T>::operator[](std::size_t index) const {
     return m_data[index];
 }
 
 template<typename T>
 std::vector<std::optional<std::size_t>> Matrix<T>::adjacent(std::size_t index) {
-    auto adjacent_indices = std::vector<std::size_t>();
+    auto adjacent_indices = std::vector<std::optional<std::size_t>>();
     auto coordinate = index_to_coordinate(index);
 
     for (std::size_t i = 0; i < coordinate.size(); i++) {

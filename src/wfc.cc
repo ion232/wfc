@@ -59,12 +59,13 @@ void Wfc::propagate() {
             auto& domain = m_variables[*index];
             if (auto changed = domain.constrain_to(valid_ids[*index])) {
                 m_variables_assigned += (changed && domain.size() == 1);
-                m_propagation_stack.emplace(index);
+                m_propagation_stack.push(std::move(*index));
             }
         }
     }
 }
 
+// TODO: ion232: This could do with being refactored for readability.
 std::vector<std::unordered_set<Id>> Wfc::valid_adjacencies(const Domain::Set& ids) {
     auto adjacencies = std::vector<Domain::Set>();
     for (std::size_t i = 0; i < m_config.model->adjacent_count(); i++) {
@@ -74,7 +75,10 @@ std::vector<std::unordered_set<Id>> Wfc::valid_adjacencies(const Domain::Set& id
     for (const auto& id : ids) {
         auto valid_adjacent_ids = m_config.model->lookup(id);
         for (std::size_t i = 0; i < valid_adjacent_ids.size(); i++) {
-            adjacencies[i].emplace(valid_adjacent_ids[i]);
+            auto& valid_ids = valid_adjacent_ids[i];
+            for (auto& valid_id : valid_ids) {
+                adjacencies[i].emplace(valid_id);
+            }
         }
     }
 

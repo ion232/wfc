@@ -5,7 +5,7 @@
 #include <set>
 #include <tuple>
 
-#include "lodepng/lodepng.h"
+#include "lodepng.h"
 
 namespace wfc::model {
 namespace {
