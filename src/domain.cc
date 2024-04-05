@@ -12,13 +12,13 @@ Domain::Domain(Id max_id)
     : m_set()
 {
     for (Id id = 0; id < max_id; id++) {
-        m_set.insert(id);
+        m_set.emplace(id);
     }
 }
 
-void Domain::choose(Id id) {
+void Domain::assign(Id id) {
     m_set.clear();
-    m_set.insert(id);
+    m_set.emplace(id);
 }
 
 bool Domain::constrain_to(const Set& allowed) {
@@ -38,11 +38,11 @@ bool Domain::constrain_to(const Set& allowed) {
     return changed;
 }
 
-Domain::Set Domain::ids() {
+Domain::Set Domain::ids() const noexcept {
     return m_set;
 }
 
-std::size_t Domain::size() {
+std::size_t Domain::size() const noexcept {
     return m_set.size();
 }
 

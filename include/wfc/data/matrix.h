@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <vector>
 
 namespace wfc::data {
@@ -17,7 +18,7 @@ public:
     Matrix(std::vector<std::size_t>&& dimensions, T value);
 
     T& operator[](std::size_t index) const;
-    std::vector<std::size_t> adjacent(std::size_t index);
+    std::vector<std::optional<std::size_t>> adjacent(std::size_t index);
     std::vector<std::size_t> dimensions();
     std::size_t size() const;
 

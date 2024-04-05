@@ -17,15 +17,21 @@ T& Matrix<T>::operator[](std::size_t index) const {
 }
 
 template<typename T>
-std::vector<std::size_t> Matrix<T>::adjacent(std::size_t index) {
+std::vector<std::optional<std::size_t>> Matrix<T>::adjacent(std::size_t index) {
     auto adjacent_indices = std::vector<std::size_t>();
     auto coordinate = index_to_coordinate(index);
 
     for (std::size_t i = 0; i < coordinate.size(); i++) {
         for (std::ptrdiff_t offset : {-1, 1}) {
-            if (coordinate[i] == 0 && offset == -1) {
+            const auto c = coordinate[i];
+            const auto oob_min = (c == 0 && offset == -1);
+            const auto oob_max = (c == m_dimensions[i] && offset == 1);
+
+            if (oob_min || oob_max) {
+                adjacent_indices.emplace_back(std::nullopt);
                 continue;
             }
+
             auto adjacent_coordinate = coordinate;
             adjacent_coordinate[i] = (adjacent_coordinate[i] + offset) % m_dimensions[i];
             auto adjacent_index = coordinate_to_index(adjacent_coordinate);

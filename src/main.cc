@@ -52,11 +52,11 @@ std::optional<SDL> setup_sdl() {
 
 void update_texture(
     SDL_Texture* texture,
-    std::vector<uint32_t>&& pixels,
+    std::vector<std::uint32_t>&& pixels,
     std::size_t width
 )
 {
-    const auto pitch = int(width * sizeof(uint32_t));
+    const auto pitch = int(width * sizeof(std::uint32_t));
     SDL_UpdateTexture(texture, nullptr, pixels.data(), pitch);
 }
 
@@ -83,10 +83,11 @@ int main() {
 
     auto image = std::make_shared<model::Image>("./assets/images/forest.png");
     auto config = [image](){
-        auto random = std::make_shared<io::Random>(1337);
+        const auto seed = 1337;
+        auto random = std::make_shared<io::Random>(seed);
         auto weights = std::make_shared<heuristic::Weights>(image->weights());
         auto sample = std::make_shared<heuristic::assignment::Sample>(weights, random);
-        auto entropy = std::make_shared<heuristic::variable::Entropy>(weights);
+        auto entropy = std::make_shared<heuristic::variable::Entropy>(weights, random);
         return Wfc::Config{sample, entropy, image, random};
     }();
     auto dimensions = std::vector<std::size_t>({image_width, image_height});

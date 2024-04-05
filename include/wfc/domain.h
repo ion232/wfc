@@ -22,11 +22,11 @@ public:
     Domain();
     Domain(Id max_id);
 
-    void choose(Id id);
+    void assign(Id id);
     bool constrain_to(const Set& allowed);
 
-    Set ids();
-    std::size_t size();
+    Set ids() const noexcept;
+    std::size_t size() const noexcept;
 };
 
 } // namespace wfc

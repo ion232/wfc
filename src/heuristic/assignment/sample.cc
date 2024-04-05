@@ -10,11 +10,29 @@ Sample::Sample(
     , m_random(std::move(random))
 {}
 
-Id Sample::assign(const Domain::Set& ids) {
-    auto offset = m_random->make_size_t(0, ids.size());
-    auto id = *std::next(ids.begin(), offset);
+Id Sample::choose_from(const Domain::Set& ids) {
+    const auto weights = m_weights->of(ids);
 
-    return id;
+    auto total = std::size_t(0);
+    for (const auto& w : weights) {
+        total += w;
+    }
+
+    const auto random_int = m_random->make_size_t(0, total);
+    auto it = ids.begin();
+    auto id = 0;
+    total = 0;
+
+    // TODO: ion232: Use binary search or see if there is a better method.
+    for (std::size_t i = 0; i < ids.size(); i++) {
+        total += weights[i];
+        if (random_int <= total) {
+            return *it;
+        }
+        it = std::next(it);
+    } 
+
+    return 0;
 }
 
 } // namespace wfc::heuristic::assignment 

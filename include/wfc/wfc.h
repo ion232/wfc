@@ -36,10 +36,10 @@ public:
     bool step();
 
 private:
-    void observe();
+    void constrain();
     void propagate();
 
-    std::unordered_set<Id> valid_adjacent(const Domain::Set& ids);
+    std::vector<std::unordered_set<Id>> valid_adjacencies(const Domain::Set& ids);
     bool resolved();
 };
 
