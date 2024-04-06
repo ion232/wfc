@@ -86,6 +86,8 @@
         "variant": "cpp",
         "__nullptr": "cpp",
         "__string": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "charconv": "cpp",
+        "execution": "cpp"
     }
 }

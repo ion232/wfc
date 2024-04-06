@@ -24,8 +24,8 @@ public:
     std::size_t size() const;
 
 private:
-    std::vector<size_t> index_to_coordinate(std::size_t index);
-    std::size_t coordinate_to_index(std::vector<size_t> coordinates);
+    std::vector<int64_t> index_to_coordinate(std::size_t index);
+    std::size_t coordinate_to_index(std::vector<int64_t>&& coordinates);
 };
 
 } // namespace wfc::data

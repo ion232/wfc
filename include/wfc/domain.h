@@ -11,21 +11,17 @@
 namespace wfc {
 
 class Domain {
-public:
-    using Set = std::unordered_set<Id>;
-    using ScoreFunction = std::function<float(const Set&)>;
-
 private:
-    Set m_set;
+    IdSet m_set;
 
 public:
     Domain();
     Domain(Id max_id);
 
     void assign(Id id);
-    bool constrain_to(const Set& allowed);
+    bool constrain_to(const IdSet& allowed);
 
-    Set ids() const noexcept;
+    IdSet ids() const noexcept;
     std::size_t size() const noexcept;
 };
 

@@ -1,5 +1,6 @@
 #include "wfc/domain.h"
 
+#include <iostream>
 #include <vector>
 
 namespace wfc {
@@ -21,7 +22,7 @@ void Domain::assign(Id id) {
     m_set.emplace(id);
 }
 
-bool Domain::constrain_to(const Set& allowed) {
+bool Domain::constrain_to(const IdSet& allowed) {
     auto to_remove = std::vector<Id>();
 
     for (const auto& id : m_set) {
@@ -38,7 +39,7 @@ bool Domain::constrain_to(const Set& allowed) {
     return changed;
 }
 
-Domain::Set Domain::ids() const noexcept {
+IdSet Domain::ids() const noexcept {
     return m_set;
 }
 

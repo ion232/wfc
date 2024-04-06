@@ -22,9 +22,9 @@ bool Side::operator==(const Side& other) const {
 
 std::size_t std::hash<wfc::model::overlap::Side>::operator()(const wfc::model::overlap::Side& side) const noexcept {
     auto h = std::hash<std::uint32_t>();
-    auto result = 1337;
+    auto result = std::size_t(1337);
     for (const auto& x : side.m_elements) {
-        result = result ^ (h(x) << 1);
+        result = result ^ (h(x) << 1ull);
     }
     return result;
 }

@@ -16,7 +16,7 @@ class Entropy: public interface::Variable {
 private:
     std::shared_ptr<Weights> m_weights;
     std::shared_ptr<io::Random> m_random;
-    std::unordered_map<Id, float> m_undecided;
+    std::unordered_map<std::size_t, float> m_undecided;
 
 public:
     Entropy() = delete;

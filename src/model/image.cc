@@ -79,8 +79,8 @@ std::vector<std::uint32_t> Image::make_pixels(const data::Matrix<Domain>& variab
     auto pixels = std::vector<std::uint32_t>();
 
     for (std::size_t index = 0; index < variables.size(); index++) {
-        auto id = *variables[index].ids().begin();
-        auto pixel = m_pixels[id];
+        auto ids = variables[index].ids();
+        auto pixel = ids.empty() ? 80000 : m_pixels[*ids.begin()];
         pixels.emplace_back(std::move(pixel));
     }
 

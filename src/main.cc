@@ -8,8 +8,8 @@
 
 #include <SDL3/SDL.h>
 
-static constexpr auto screen_width = int(480);
-static constexpr auto screen_height = int(480);
+static constexpr auto screen_width = int(64);
+static constexpr auto screen_height = int(64);
 
 struct SDL {
     SDL_Window* window;
@@ -34,7 +34,7 @@ std::optional<SDL> setup_sdl() {
         return std::nullopt;
     }
 
-    const auto pixel_color = SDL_MapRGB(screen_surface->format, 0xFF, 0xFF, 0xFF);
+    const auto pixel_color = SDL_MapRGB(screen_surface->format, 0xAA, 0xAA, 0xAA);
     if (SDL_FillSurfaceRect(screen_surface, nullptr, pixel_color) != 0) {
         std::cout << "SDL error: " << SDL_GetError() << std::endl;
         return std::nullopt;
@@ -45,83 +45,76 @@ std::optional<SDL> setup_sdl() {
         return std::nullopt;
     }
 
-    auto sdl = SDL{ window };
+    auto sdl = SDL{window};
 
     return sdl;
 }
 
-void update_texture(
-    SDL_Texture* texture,
-    std::vector<std::uint32_t>&& pixels,
-    std::size_t width
-)
-{
-    const auto pitch = int(width * sizeof(std::uint32_t));
-    SDL_UpdateTexture(texture, nullptr, pixels.data(), pitch);
-}
-
 int main() {
     using namespace wfc;
-
-    auto sdl = setup_sdl();
-    if (!sdl) {
-        return 1;
-    }
-
-    static constexpr auto image_width = 480;
-    static constexpr auto image_height = 480;
-    static constexpr auto no_renderer_flags = 0;
-
-    auto* renderer = SDL_CreateRenderer(sdl->window, "PixelRenderer", no_renderer_flags);
-    auto* texture = SDL_CreateTexture(
-        renderer,
-        SDL_PIXELFORMAT_RGBA8888,
-        SDL_TEXTUREACCESS_STREAMING,
-        image_width,
-        image_height
-    );
-
-    const auto image_path = std::filesystem::path("./assets/images/forest.png");
+    
+    static constexpr auto output_width = screen_width;
+    static constexpr auto output_height = screen_height;
+    
+    const auto image_path = std::filesystem::path("/Users/ion/Repos/wfc/assets/images/forest.png");
     auto image = std::make_shared<model::Image>(std::move(*model::load_image(image_path)));
     auto config = [image](){
-        const auto seed = 1337;
+        const auto seed = std::size_t(1337);
         auto random = std::make_shared<io::Random>(seed);
         auto weights = std::make_shared<heuristic::Weights>(image->weights());
         auto sample = std::make_shared<heuristic::assignment::Sample>(weights, random);
         auto entropy = std::make_shared<heuristic::variable::Entropy>(weights, random);
         return Wfc::Config{sample, entropy, image, random};
     }();
-    auto dimensions = std::vector<std::size_t>({image_width, image_height});
+    auto dimensions = std::vector<std::size_t>({output_width, output_height});
     auto matrix = data::Matrix<Domain>(
-        std::move(dimensions),
-        Domain(image->max_id())
-    );
+                                       std::move(dimensions),
+                                       Domain(image->max_id())
+                                       );
     auto wfc = Wfc(std::move(config), std::move(matrix));
-
-    auto sdl_event = SDL_Event();
+    
     auto running = true;
+        while (running) {
+            running = !wfc.step();
+        }
+        running = true;
+    
+    const auto& xs = wfc.variables();
+    auto pixels = image->make_pixels(xs);
+
+    auto sdl = setup_sdl();
+    if (!sdl) {
+        return 1;
+    }
+    
+    auto* surface = SDL_GetWindowSurface(sdl->window);
+    auto sdl_event = SDL_Event();
 
     while (running) {
-        if (!wfc.step()) {
-            auto pixels = image->make_pixels(wfc.variables());
-            update_texture(texture, std::move(pixels), image_width);
-            SDL_RenderClear(renderer);
-            SDL_RenderTexture(renderer, texture, nullptr, nullptr);
-        }
-
-        while (SDL_PollEvent(&sdl_event)){
-            if (sdl_event.type == SDL_EVENT_QUIT) {
-                running = false;
+        if (SDL_LockSurface(surface) == 0) {
+            auto* screen_pixels = static_cast<uint32_t*>(surface->pixels);
+            for (int y = 0; y < output_width; y++) {
+                for (int x = 0; x < output_height; x++) {
+                    screen_pixels[y * screen_width + x] = pixels[y * output_width + x];
+                }
             }
+
+            SDL_UnlockSurface(surface);
         }
+        
+        SDL_UpdateWindowSurface(sdl->window);
 
-        SDL_Delay(1);
-    }
+         while (SDL_PollEvent(&sdl_event)){
+             if  (sdl_event.type == SDL_EVENT_QUIT) {
+                 running = false;
+             }
+         }
 
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyTexture(texture);
-    SDL_DestroyWindow(sdl->window);
-    SDL_Quit();
+         SDL_Delay(1);
+     }
+
+     SDL_DestroyWindow(sdl->window);
+     SDL_Quit();
 
     return 0;
 }

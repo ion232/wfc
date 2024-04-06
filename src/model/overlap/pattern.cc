@@ -39,9 +39,9 @@ bool Pattern::operator==(const Pattern& other) const {
 
 std::size_t std::hash<wfc::model::overlap::Pattern>::operator()(const wfc::model::overlap::Pattern& pattern) const noexcept {
     auto h = std::hash<wfc::model::overlap::Side>();
-    auto result = 1337;
+    auto result = std::size_t(1337);
     for (const auto& side : pattern.m_sides) {
-        result = result ^ (h(side) << 1);
+        result = result ^ (h(side) << 1ull);
     }
     return result;
 }

@@ -34,14 +34,13 @@ Entropy::Entropy(
 {}
 
 void Entropy::inform(std::size_t index, const Domain& domain) {
-    auto weights = m_weights->of(domain.ids());
-    auto entropy = calculate_entropy(std::move(weights));
-
     if (auto it = m_undecided.find(index); it != m_undecided.end()) {
         m_undecided.erase(it);
     }
     
-    if (domain.size() > 0) {
+    if (domain.size() >= 2) {
+        auto weights = m_weights->of(domain.ids());
+        auto entropy = calculate_entropy(std::move(weights));
         m_undecided[index] = entropy;
     }
 }
@@ -57,8 +56,12 @@ std::optional<std::size_t> Entropy::pick_variable() {
             variable_indices.clear();
         }
         if (entropy == min_entropy) {
-            variable_indices.emplace_back(entropy);
+            variable_indices.emplace_back(it->first);
         }
+    }
+    
+    if (variable_indices.size() == 0) {
+        return std::nullopt;
     }
 
     if (variable_indices.size() == 1) {
@@ -67,6 +70,7 @@ std::optional<std::size_t> Entropy::pick_variable() {
 
     const auto random_index = m_random->make_size_t(0, variable_indices.size());
     const auto variable_index = variable_indices[random_index];
+    m_undecided.erase(variable_index);
 
     return variable_index;
 }

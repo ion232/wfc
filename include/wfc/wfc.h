@@ -31,15 +31,15 @@ private:
 public:
     Wfc(Config&& config, data::Matrix<Domain>&& variables);
 
-    const data::Matrix<Domain>& variables();
+    data::Matrix<Domain>& variables();
 
     bool step();
 
 private:
-    void constrain();
+    bool constrain();
     void propagate();
 
-    std::vector<std::unordered_set<Id>> valid_adjacencies(const Domain::Set& ids);
+    std::vector<std::unordered_set<Id>> valid_adjacencies(const IdSet& ids);
     bool resolved();
 };
 
