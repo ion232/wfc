@@ -1,6 +1,8 @@
 #include "wfc/model/image.h"
 #include "wfc/model/overlap/pattern.h"
 
+#include <iostream>
+#include <limits>
 #include <map>
 #include <set>
 #include <tuple>
@@ -37,7 +39,7 @@ namespace {
                 const auto b = static_cast<std::uint32_t>(raw_data[raw_index + 2]);
                 const auto a = static_cast<std::uint32_t>(raw_data[raw_index + 3]);
 
-                pixels[y][x] = (r << 24) | (g << 16) | (b << 8) | a;
+                pixels[y][x] = (a << 24) | (r << 16) | (g << 8) | b;
             }
         }
 
@@ -80,7 +82,16 @@ std::vector<std::uint32_t> Image::make_pixels(const data::Matrix<Domain>& variab
 
     for (std::size_t index = 0; index < variables.size(); index++) {
         auto ids = variables[index].ids();
-        auto pixel = ids.empty() ? 80000 : m_pixels[*ids.begin()];
+        auto pixel = [this, &ids](){
+            if (ids.size() == 1) {
+                return m_pixels[*ids.begin()];
+            } else if (ids.size() >= 2) {
+                return std::uint32_t(0);
+            } else {
+                std::cout << "Empty domain." << std::endl;
+                return std::numeric_limits<std::uint32_t>::max();
+            }
+        }();
         pixels.emplace_back(std::move(pixel));
     }
 

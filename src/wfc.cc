@@ -49,7 +49,7 @@ bool Wfc::constrain() {
         return true;
     }
     domain.assign(*id);
-    std::cout << "Assigned: " << std::to_string(*id) << std::endl;
+    std::cout << "Assigned id " << std::to_string(*id) << " to index " << std::to_string(*index) << std::endl;
 
     m_variables_assigned++;
     m_config.variable_heuristic->inform(*index, domain);
@@ -74,6 +74,7 @@ void Wfc::propagate() {
 
             auto& domain = m_variables[*index];
             if (auto changed = domain.constrain_to(valid_ids[i])) {
+                m_config.variable_heuristic->inform(*index, m_variables[*index]);
                 m_variables_assigned += (changed && domain.size() == 1);
                 m_propagation_stack.push(std::move(*index));
             }

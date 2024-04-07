@@ -18,8 +18,7 @@ Domain::Domain(Id max_id)
 }
 
 void Domain::assign(Id id) {
-    m_set.clear();
-    m_set.emplace(id);
+    m_set = IdSet({id});
 }
 
 bool Domain::constrain_to(const IdSet& allowed) {

@@ -8,8 +8,8 @@
 
 #include <SDL3/SDL.h>
 
-static constexpr auto screen_width = int(64);
-static constexpr auto screen_height = int(64);
+static constexpr auto screen_width = int(256);
+static constexpr auto screen_height = int(256);
 
 struct SDL {
     SDL_Window* window;
@@ -56,7 +56,7 @@ int main() {
     static constexpr auto output_width = screen_width;
     static constexpr auto output_height = screen_height;
     
-    const auto image_path = std::filesystem::path("/Users/ion/Repos/wfc/assets/images/forest.png");
+    const auto image_path = std::filesystem::path("/Users/ion/Repos/wfc/assets/images/village.png");
     auto image = std::make_shared<model::Image>(std::move(*model::load_image(image_path)));
     auto config = [image](){
         const auto seed = std::size_t(1337);

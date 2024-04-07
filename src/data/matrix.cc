@@ -39,8 +39,6 @@ std::vector<std::optional<std::size_t>> Matrix<T>::adjacent(std::size_t index) {
             }
 
             auto adjacent_coordinate = coordinate;
-            std::cout << "adjcoord: " << std::to_string(adjacent_coordinate[i]) << " offset: " << std::to_string(offset) << std::endl;
-
             adjacent_coordinate[i] = (adjacent_coordinate[i] + offset);
             auto adjacent_index = coordinate_to_index(std::move(adjacent_coordinate));
             adjacent_indices.emplace_back(std::move(adjacent_index));
