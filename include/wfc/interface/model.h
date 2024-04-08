@@ -14,7 +14,7 @@ public:
     using Weights = IdMap<std::size_t>;
 
     virtual ~Model() {};
-    virtual Adjacencies lookup(Id id) = 0;
+    virtual Adjacencies& lookup(Id id) = 0;
     virtual std::size_t adjacent_count() = 0;
     virtual Weights weights() = 0;
     virtual Domain initial_domain() = 0;

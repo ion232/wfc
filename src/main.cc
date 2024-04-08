@@ -8,8 +8,8 @@
 
 #include <SDL3/SDL.h>
 
-static constexpr auto screen_width = int(64);
-static constexpr auto screen_height = int(64);
+static constexpr auto screen_width = int(32);
+static constexpr auto screen_height = int(32);
 
 struct SDL {
     SDL_Window* window;

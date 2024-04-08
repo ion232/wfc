@@ -48,7 +48,7 @@ namespace {
 }
 
 Image::Image(
-    IdMap<Model::Adjacencies> adjacencies,
+    std::vector<Model::Adjacencies> adjacencies,
     Model::Weights weights,
     IdMap<std::uint32_t> pixels,
     IdMap<std::size_t> support_counts
@@ -59,7 +59,7 @@ Image::Image(
     , m_support_counts(std::move(support_counts))
 {}
 
-Image::Adjacencies Image::lookup(Id id) {
+Image::Adjacencies& Image::lookup(Id id) {
     return m_adjacencies[id];
 }
 
@@ -172,10 +172,10 @@ std::optional<Image> load_image(std::filesystem::path path) {
 
     // TODO: ion232: Make this derived or otherwise configurable.
     static constexpr auto adjacent_count = std::size_t(8);
-    auto adjacency_map = IdMap<Image::Adjacencies>();
+    auto adjacency_map = std::vector<Image::Adjacencies>();
     auto support_map = IdMap<std::size_t>();
     for (auto& [id, _] : pattern_map) {
-        adjacency_map.insert({id, Image::Adjacencies(adjacent_count, IdMap<std::size_t>())});
+        adjacency_map.emplace_back(adjacent_count, IdMap<std::size_t>());
         support_map.insert({id, 1});
     }
 

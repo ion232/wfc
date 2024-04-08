@@ -28,7 +28,7 @@ std::optional<Id> Sample::choose_from(const IdSet& ids) {
         if (random_int <= total) {
             return *it;
         }
-        it = std::next(it);
+        ++it;
     }
 
     return std::nullopt;

@@ -17,9 +17,9 @@ Wfc::Wfc(Config&& config, data::Matrix<Domain>&& variables)
 }
 
 bool Wfc::step() {
-    // static auto steps = std::size_t(0);
+     static auto steps = std::size_t(0);
     
-    // std::cout << "Steps: " << std::to_string(steps++) << std::endl;
+     std::cout << "Steps: " << std::to_string(steps++) << std::endl;
 
     if (resolved()) {
         return true;
@@ -51,7 +51,7 @@ bool Wfc::constrain() {
         return true;
     }
     domain.assign(*id);
-    // std::cout << "Assigned id " << std::to_string(*id) << " to index " << std::to_string(*index) << std::endl;
+     std::cout << "Assigned id " << std::to_string(*id) << " to index " << std::to_string(*index) << std::endl;
 
     m_variables_assigned++;
     m_config.variable_heuristic->inform(*index, domain);
@@ -74,11 +74,6 @@ bool Wfc::propagate() {
                 continue;
             }
             auto& domain = m_variables[*index];
-            auto domain_copy = domain;
-//            for (auto x : domain.ids()) {
-//                std::cout << std::to_string(x) << ",";
-//            }
-//            std::cout << std::endl;
 
             if (auto changed = domain.constrain_to(valid_ids[i])) {
                 if (domain.size() == 0) {
@@ -96,18 +91,18 @@ bool Wfc::propagate() {
 }
 
 // TODO: ion232: This could do with being refactored for readability.
-std::vector<std::unordered_set<Id>> Wfc::valid_adjacencies(const IdSet& ids) {
-    auto adjacencies = std::vector<IdSet>();
-    for (std::size_t i = 0; i < m_config.model->adjacent_count(); i++) {
-        std::ignore = adjacencies.emplace_back();
+std::vector<IdSet> Wfc::valid_adjacencies(const IdSet& ids) {
+    static auto adjacencies = std::vector<IdSet>(8, IdSet(ids.capacity() - 1));
+    for (auto& id_set : adjacencies) {
+        id_set.clear();
     }
 
     for (const auto& id : ids) {
-        auto valid_adjacent_ids = m_config.model->lookup(id);
+        const auto& valid_adjacent_ids = m_config.model->lookup(id);
         for (std::size_t i = 0; i < valid_adjacent_ids.size(); i++) {
-            auto& valid_ids = valid_adjacent_ids[i];
-            for (auto& [valid_id, count] : valid_ids) {
-                adjacencies[i].emplace(valid_id);
+            const auto& valid_ids = valid_adjacent_ids[i];
+            for (const auto& [valid_id, count] : valid_ids) {
+                adjacencies[i].insert(valid_id);
             }
         }
     }

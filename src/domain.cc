@@ -41,7 +41,7 @@ bool Domain::constrain_to(const IdSet& allowed) {
 }
 
 IdSet Domain::ids() const noexcept {
-    auto ids = IdSet();
+    auto ids = IdSet(60);
     for (const auto& [id, count] : m_map) {
         if (count != 0) {
             ids.insert(id);

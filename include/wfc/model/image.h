@@ -13,7 +13,7 @@ namespace wfc::model {
 
 class Image: public interface::Model {
 private:
-    IdMap<Model::Adjacencies> m_adjacencies;
+    std::vector<Model::Adjacencies> m_adjacencies;
     Model::Weights m_weights;
     IdMap<std::uint32_t> m_pixels;
     IdMap<std::size_t> m_support_counts;
@@ -21,13 +21,13 @@ private:
 public:
     Image() = delete;
     Image(
-        IdMap<Model::Adjacencies> adjacencies,
+        std::vector<Model::Adjacencies> adjacencies,
         Model::Weights weights,
         IdMap<std::uint32_t> pixels,
         IdMap<std::size_t> support_counts
     );
 
-    Model::Adjacencies lookup(Id id) override;
+    Model::Adjacencies& lookup(Id id) override;
     std::size_t adjacent_count() override;
     Model::Weights weights() override;
     Domain initial_domain() override;
