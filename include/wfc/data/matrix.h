@@ -15,6 +15,7 @@ private:
 
 public:
     Matrix() = delete;
+    Matrix(std::vector<std::size_t>&& dimensions, std::vector<T>&& data);
     Matrix(std::vector<std::size_t>&& dimensions, T value);
 
     T& operator[](std::size_t index);
@@ -23,9 +24,18 @@ public:
     std::vector<std::size_t> dimensions();
     std::size_t size() const;
 
+    bool operator==(const Matrix<T>& other) const;
+
+    friend class std::hash<Matrix<std::uint32_t>>;
+
 private:
     std::vector<int64_t> index_to_coordinate(std::size_t index);
     std::size_t coordinate_to_index(std::vector<int64_t>&& coordinates);
 };
 
 } // namespace wfc::data
+
+template<>
+struct std::hash<wfc::data::Matrix<std::uint32_t>> {
+    std::size_t operator()(const wfc::data::Matrix<std::uint32_t>& matrix) const noexcept;
+};

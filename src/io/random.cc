@@ -15,9 +15,9 @@ Random::Random()
     , m_engine(m_seed_seq)
 {}
 
-Random::Random(std::size_t seed)
+Random::Random(std::int32_t seed)
     : m_device()
-    , m_seed_seq({seed})
+    , m_seed_seq({seed, seed, seed, seed, seed, seed, seed, seed})
     , m_engine(m_seed_seq)
 {}
 

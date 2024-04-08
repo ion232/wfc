@@ -17,9 +17,9 @@ Wfc::Wfc(Config&& config, data::Matrix<Domain>&& variables)
 }
 
 bool Wfc::step() {
-    static auto steps = std::size_t(0);
+    // static auto steps = std::size_t(0);
     
-    std::cout << "Steps: " << std::to_string(steps++) << std::endl;
+    // std::cout << "Steps: " << std::to_string(steps++) << std::endl;
 
     if (resolved()) {
         return true;
@@ -29,7 +29,9 @@ bool Wfc::step() {
         return true;
     }
 
-    propagate();
+    if (propagate()) {
+        return true;
+    }
 
     return false;
 }
@@ -49,7 +51,7 @@ bool Wfc::constrain() {
         return true;
     }
     domain.assign(*id);
-    std::cout << "Assigned id " << std::to_string(*id) << " to index " << std::to_string(*index) << std::endl;
+    // std::cout << "Assigned id " << std::to_string(*id) << " to index " << std::to_string(*index) << std::endl;
 
     m_variables_assigned++;
     m_config.variable_heuristic->inform(*index, domain);
@@ -58,7 +60,7 @@ bool Wfc::constrain() {
     return false;
 }
 
-void Wfc::propagate() {
+bool Wfc::propagate() {
     while (!m_propagation_stack.empty()) {
         const auto& current_index = m_propagation_stack.top();
         auto& current_domain = m_variables[current_index];
@@ -71,15 +73,26 @@ void Wfc::propagate() {
             if (!index) {
                 continue;
             }
-
             auto& domain = m_variables[*index];
+            auto domain_copy = domain;
+//            for (auto x : domain.ids()) {
+//                std::cout << std::to_string(x) << ",";
+//            }
+//            std::cout << std::endl;
+
             if (auto changed = domain.constrain_to(valid_ids[i])) {
-                m_config.variable_heuristic->inform(*index, m_variables[*index]);
-                m_variables_assigned += (changed && domain.size() == 1);
+                if (domain.size() == 0) {
+                    return true;
+                } else if (domain.size() == 1) {
+                    m_variables_assigned += 1;
+                }
+                m_config.variable_heuristic->inform(*index, domain);
                 m_propagation_stack.push(std::move(*index));
             }
         }
     }
+
+    return false;
 }
 
 // TODO: ion232: This could do with being refactored for readability.
@@ -93,7 +106,7 @@ std::vector<std::unordered_set<Id>> Wfc::valid_adjacencies(const IdSet& ids) {
         auto valid_adjacent_ids = m_config.model->lookup(id);
         for (std::size_t i = 0; i < valid_adjacent_ids.size(); i++) {
             auto& valid_ids = valid_adjacent_ids[i];
-            for (auto& valid_id : valid_ids) {
+            for (auto& [valid_id, count] : valid_ids) {
                 adjacencies[i].emplace(valid_id);
             }
         }

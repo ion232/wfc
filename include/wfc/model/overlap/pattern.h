@@ -1,18 +1,19 @@
 #pragma once
 
-#include "wfc/model/overlap/side.h"
+#include "wfc/data/matrix.h"
 
+#include <cstdint>
 #include <vector>
 
 namespace wfc::model::overlap {
 
 class Pattern {
 private:
+    data::Matrix<std::uint32_t> m_matrix;
     std::uint32_t m_value;
-    std::vector<Side> m_sides;
 
 public:
-    Pattern(std::uint32_t value, std::vector<Side>&& sides);
+    Pattern(data::Matrix<std::uint32_t>&& matrix, std::uint32_t value);
 
     std::uint32_t value() const;
     std::vector<bool> adjacencies(const Pattern& other) const;

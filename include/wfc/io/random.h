@@ -12,7 +12,7 @@ private:
 
 public:
     Random();
-    Random(std::size_t seed);
+    Random(std::int32_t seed);
 
     std::size_t make_size_t(std::size_t min, std::size_t max);
     float make_float(float min, float max);

@@ -12,17 +12,19 @@ namespace wfc {
 
 class Domain {
 private:
-    IdSet m_set;
+    IdMap<std::size_t> m_map;
 
 public:
     Domain();
-    Domain(Id max_id);
+    Domain(IdMap<std::size_t>&& map);
 
     void assign(Id id);
     bool constrain_to(const IdSet& allowed);
 
     IdSet ids() const noexcept;
     std::size_t size() const noexcept;
+
+    bool operator==(const Domain& other) const;
 };
 
 } // namespace wfc

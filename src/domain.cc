@@ -6,32 +6,34 @@
 namespace wfc {
 
 Domain::Domain()
-    : m_set()
+    : m_map()
 {}
 
-Domain::Domain(Id max_id)
-    : m_set()
-{
-    for (Id id = 0; id < max_id; id++) {
-        m_set.emplace(id);
-    }
-}
+Domain::Domain(IdMap<std::size_t>&& map)
+    : m_map(std::move(map))
+{}
 
 void Domain::assign(Id id) {
-    m_set = IdSet({id});
+    m_map = IdMap<std::size_t>({{id, m_map[id]}});
 }
 
 bool Domain::constrain_to(const IdSet& allowed) {
     auto to_remove = std::vector<Id>();
 
-    for (const auto& id : m_set) {
-        if (!allowed.contains(id)) {
+    for (auto& [id, count] : m_map) {
+        if (allowed.contains(id)) {
+            continue;
+        }
+
+        count--;
+
+        if (count == 0) {
             to_remove.emplace_back(id);
         }
     }
 
     for (const auto& id : to_remove) {
-        m_set.erase(id);
+        m_map.erase(id);
     }
 
     auto changed = to_remove.size() > 0;
@@ -39,11 +41,21 @@ bool Domain::constrain_to(const IdSet& allowed) {
 }
 
 IdSet Domain::ids() const noexcept {
-    return m_set;
+    auto ids = IdSet();
+    for (const auto& [id, count] : m_map) {
+        if (count != 0) {
+            ids.insert(id);
+        }
+    }
+    return ids;
 }
 
 std::size_t Domain::size() const noexcept {
-    return m_set.size();
+    return m_map.size();
+}
+
+bool Domain::operator==(const Domain& other) const {
+    return m_map == other.m_map;
 }
 
 } // namespace wfc
