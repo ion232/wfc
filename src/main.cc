@@ -8,8 +8,8 @@
 
 #include <SDL3/SDL.h>
 
-static constexpr auto screen_width = int(256);
-static constexpr auto screen_height = int(256);
+static constexpr auto screen_width = int(64);
+static constexpr auto screen_height = int(64);
 
 struct SDL {
     SDL_Window* window;
@@ -56,11 +56,11 @@ int main() {
     static constexpr auto output_width = screen_width;
     static constexpr auto output_height = screen_height;
     
-    const auto image_path = std::filesystem::path("/Users/ion/Repos/wfc/assets/images/flowers.png");
+    const auto image_path = std::filesystem::path("/Users/ion/Repos/wfc/assets/images/village.png");
     auto image = std::make_shared<model::Image>(std::move(*model::load_image(image_path)));
     auto config = [image](){
-        const auto seed = std::int32_t(1337);
-        auto random = std::make_shared<io::Random>(seed);
+        // const auto seed = std::int32_t(1337);
+        auto random = std::make_shared<io::Random>();
         auto weights = std::make_shared<heuristic::Weights>(image->weights());
         auto sample = std::make_shared<heuristic::assignment::Sample>(weights, random);
         auto entropy = std::make_shared<heuristic::variable::Entropy>(weights, random);
@@ -74,12 +74,13 @@ int main() {
     auto wfc = Wfc(std::move(config), std::move(matrix));
     
     auto running = true;
-//        while (running) {
-//            running =
-//        }
-//        running = true;
+    while (running) {
+        running = !wfc.step();
+    }
+    running = true;
     
-
+    const auto& xs = wfc.variables();
+    auto pixels = image->make_pixels(xs);
 
     auto sdl = setup_sdl();
     if (!sdl) {
@@ -90,9 +91,7 @@ int main() {
     auto sdl_event = SDL_Event();
 
     while (running) {
-        if (!wfc.step() && SDL_LockSurface(surface) == 0) {
-            const auto& xs = wfc.variables();
-            auto pixels = image->make_pixels(xs);
+        if (SDL_LockSurface(surface) == 0) {
             auto* screen_pixels = static_cast<uint32_t*>(surface->pixels);
             for (int y = 0; y < output_width; y++) {
                 for (int x = 0; x < output_height; x++) {

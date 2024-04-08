@@ -5,22 +5,22 @@
 namespace wfc::heuristic::variable {
 namespace {
     float calculate_entropy(std::vector<std::size_t>&& weights) {
-//        auto entropy = float(0);
-//        auto total_weight = float(0);
-//
-//        for (const auto& w : weights) {
-//            total_weight += w;
-//        }
-//
-//        for (const auto& w : weights) {
-//            if (w == 0) {
-//                continue;
-//            }
-//            auto p = w / total_weight;
-//            entropy -= p * std::log2f(p);
-//        }
+       auto entropy = float(0);
+       auto total_weight = float(0);
 
-        return weights.size();
+       for (const auto& w : weights) {
+           total_weight += w;
+       }
+
+       for (const auto& w : weights) {
+           if (w == 0) {
+               continue;
+           }
+           auto p = w / total_weight;
+           entropy -= p * std::log2f(p);
+       }
+
+        return entropy;
     }
 }
 
