@@ -1,6 +1,6 @@
 #pragma once
 
-#include "wfc/data/matrix.h"
+#include "wfc/data/tensor.h"
 
 #include <cstdint>
 #include <vector>
@@ -9,11 +9,11 @@ namespace wfc::model::overlap {
 
 class Pattern {
 private:
-    data::Matrix<std::uint32_t> m_matrix;
+    data::Tensor<std::uint32_t> m_tensor;
     std::uint32_t m_value;
 
 public:
-    Pattern(data::Matrix<std::uint32_t>&& matrix, std::uint32_t value);
+    Pattern(data::Tensor<std::uint32_t>&& tensor, std::uint32_t value);
 
     std::uint32_t value() const;
     std::vector<bool> adjacencies(const Pattern& other) const;

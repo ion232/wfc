@@ -67,11 +67,11 @@ int main() {
         return Wfc::Config{sample, entropy, image, random};
     }();
     auto dimensions = std::vector<std::size_t>({output_width, output_height});
-    auto matrix = data::Matrix<Domain>(
+    auto tensor = data::Tensor<Variable>(
                                        std::move(dimensions),
-                                       Domain(image->initial_domain())
+                                       Variable(image->initial_variable())
                                        );
-    auto wfc = Wfc(std::move(config), std::move(matrix));
+    auto wfc = Wfc(std::move(config), std::move(tensor));
     
     auto running = true;
 //    while (running) {

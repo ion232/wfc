@@ -1,7 +1,7 @@
 #pragma once
 
-#include "wfc/domain.h"
-#include "wfc/data/matrix.h"
+#include "wfc/variable.h"
+#include "wfc/data/tensor.h"
 #include "wfc/io/random.h"
 #include "wfc/interface/model.h"
 #include "wfc/interface/heuristic/assignment.h"
@@ -24,14 +24,14 @@ public:
 
 private:
     Config m_config;
-    data::Matrix<Domain> m_variables;
+    data::Tensor<Variable> m_variables;
     std::size_t m_variables_assigned;
     std::stack<std::size_t, std::vector<std::size_t>> m_propagation_stack;
 
 public:
-    Wfc(Config&& config, data::Matrix<Domain>&& variables);
+    Wfc(Config&& config, data::Tensor<Variable>&& variables);
 
-    data::Matrix<Domain>& variables();
+    data::Tensor<Variable>& variables();
 
     bool step();
 

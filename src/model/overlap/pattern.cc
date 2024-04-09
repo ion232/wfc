@@ -4,8 +4,8 @@
 
 namespace wfc::model::overlap {
 
-Pattern::Pattern(data::Matrix<std::uint32_t>&& matrix, std::uint32_t value)
-    : m_matrix(std::move(matrix))
+Pattern::Pattern(data::Tensor<std::uint32_t>&& tensor, std::uint32_t value)
+    : m_tensor(std::move(tensor))
     , m_value(std::move(value))
 {}
 
@@ -35,7 +35,7 @@ std::vector<bool> Pattern::adjacencies(const Pattern& other) const {
         const auto& other_area = areas[(i + 4) % count];
 
         for (std::size_t j = 0; j < area.size(); j++) {
-            if (m_matrix[area[j]] != other.m_matrix[other_area[j]]) {
+            if (m_tensor[area[j]] != other.m_tensor[other_area[j]]) {
                 adjacencies[i] = false;
                 break;
             }
@@ -46,14 +46,14 @@ std::vector<bool> Pattern::adjacencies(const Pattern& other) const {
 }
 
 bool Pattern::operator==(const Pattern& other) const {
-    return this->m_matrix == other.m_matrix;
+    return this->m_tensor == other.m_tensor;
 }
 
 } // namespace wfc::model::overlap
 
 std::size_t std::hash<wfc::model::overlap::Pattern>::operator()(const wfc::model::overlap::Pattern& pattern) const noexcept {
-    auto h = std::hash<wfc::data::Matrix<std::uint32_t>>();
+    auto h = std::hash<wfc::data::Tensor<std::uint32_t>>();
     auto result = std::size_t(1337);
-    result = result ^ (h(pattern.m_matrix) << 1ull);
+    result = result ^ (h(pattern.m_tensor) << 1ull);
     return result;
 }

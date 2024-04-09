@@ -1,7 +1,7 @@
 #pragma once
 
 #include "wfc/id.h"
-#include "wfc/domain.h"
+#include "wfc/variable.h"
 
 #include <cstddef>
 #include <unordered_map>

@@ -71,13 +71,13 @@ Image::Weights Image::weights() {
     return m_weights;
 }
 
-Domain Image::initial_domain() {
+Variable Image::initial_variable() {
     auto map = m_support_counts;
-    auto domain = Domain(std::move(map));
-    return domain;
+    auto variable = Variable(std::move(map));
+    return variable;
 }
 
-std::vector<std::uint32_t> Image::make_pixels(const data::Matrix<Domain>& variables) {
+std::vector<std::uint32_t> Image::make_pixels(const data::Tensor<Variable>& variables) {
     auto pixels = std::vector<std::uint32_t>();
 
     for (std::size_t index = 0; index < variables.size(); index++) {
@@ -127,9 +127,9 @@ std::optional<Image> load_image(std::filesystem::path path) {
         for (std::size_t x = 1; x < pixels[y].size() - 1; x++) {
             auto block = make_block(pixels, x, y);
             // TODO: ion232: More magic to refactor.
-            auto matrix = data::Matrix<std::uint32_t>({3, 3}, std::move(block));
+            auto tensor = data::Tensor<std::uint32_t>({3, 3}, std::move(block));
             auto value = pixels[y][x];
-            auto pattern = overlap::Pattern(std::move(matrix), value);
+            auto pattern = overlap::Pattern(std::move(tensor), value);
             if (!weights.contains(pattern)) {
                 weights.insert({pattern, 0});
             }
