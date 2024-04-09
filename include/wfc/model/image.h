@@ -1,7 +1,7 @@
 #pragma once
 
 #include "wfc/domain.h"
-#include "wfc/data/matrix.h"
+#include "wfc/data/tensor.h"
 #include "wfc/interface/model.h"
 
 #include <cstdint>
@@ -32,7 +32,7 @@ public:
     Model::Weights weights() override;
     Domain initial_domain() override;
 
-    std::vector<std::uint32_t> make_pixels(const data::Matrix<Domain>& matrix);
+    std::vector<std::uint32_t> make_pixels(const data::Tensor<Domain>& tensor);
 };
 
 std::optional<Image> load_image(std::filesystem::path path);

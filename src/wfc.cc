@@ -5,7 +5,7 @@
 
 namespace wfc {
 
-Wfc::Wfc(Config&& config, data::Matrix<Domain>&& variables)
+Wfc::Wfc(Config&& config, data::Tensor<Domain>&& variables)
     : m_config(std::move(config))
     , m_variables(std::move(variables))
     , m_variables_assigned(0)
@@ -36,7 +36,7 @@ bool Wfc::step() {
     return false;
 }
 
-data::Matrix<Domain>& Wfc::variables() {
+data::Tensor<Domain>& Wfc::variables() {
     return m_variables;
 }
 

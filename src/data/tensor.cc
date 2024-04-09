@@ -1,5 +1,5 @@
 #include "wfc/domain.h"
-#include "wfc/data/matrix.h"
+#include "wfc/data/tensor.h"
 
 #include <iostream>
 #include <numeric>
@@ -7,30 +7,30 @@
 namespace wfc::data {
 
 template<typename T>
-Matrix<T>::Matrix(std::vector<std::size_t>&& dimensions, std::vector<T>&& data)
+Tensor<T>::Tensor(std::vector<std::size_t>&& dimensions, std::vector<T>&& data)
     : m_dimensions(std::move(dimensions))
     , m_data(std::move(data))
 {}
 
 template<typename T>
-Matrix<T>::Matrix(std::vector<std::size_t>&& dimensions, T value)
+Tensor<T>::Tensor(std::vector<std::size_t>&& dimensions, T value)
     : m_dimensions(std::move(dimensions))
     , m_data(std::reduce(m_dimensions.begin(), m_dimensions.end(), 1ull, std::multiplies<>()), value)
 {}
 
 template<typename T>
-T& Matrix<T>::operator[](std::size_t index) {
+T& Tensor<T>::operator[](std::size_t index) {
     return m_data[index];
 }
 
 template<typename T>
-const T& Matrix<T>::operator[](std::size_t index) const {
+const T& Tensor<T>::operator[](std::size_t index) const {
     return m_data[index];
 }
 
 // TODO: Make sure this automatically corresponds to the Pattern adjacencies. Deduplicate this knowledge.
 template<typename T>
-std::vector<std::optional<std::size_t>> Matrix<T>::adjacent(std::size_t index) {
+std::vector<std::optional<std::size_t>> Tensor<T>::adjacent(std::size_t index) {
     auto coordinate = index_to_coordinate(index);
     
     const auto offsets = std::vector<std::pair<std::int64_t, std::int64_t>>({
@@ -96,22 +96,22 @@ std::vector<std::optional<std::size_t>> Matrix<T>::adjacent(std::size_t index) {
 }
 
 template<typename T>
-std::vector<std::size_t> Matrix<T>::dimensions() {
+std::vector<std::size_t> Tensor<T>::dimensions() {
     return m_dimensions;
 }
 
 template<typename T>
-std::size_t Matrix<T>::size() const {
+std::size_t Tensor<T>::size() const {
     return m_data.size();
 }
 
 template<typename T>
-bool Matrix<T>::operator==(const Matrix<T>& other) const {
+bool Tensor<T>::operator==(const Tensor<T>& other) const {
     return this->m_data == other.m_data;
 }
 
 template<typename T>
-std::vector<int64_t> Matrix<T>::index_to_coordinate(std::size_t index) {
+std::vector<int64_t> Tensor<T>::index_to_coordinate(std::size_t index) {
     auto coordinates = std::vector<std::int64_t>();
 
     for (auto it = m_dimensions.rbegin(); it != m_dimensions.rend(); it++) {
@@ -126,7 +126,7 @@ std::vector<int64_t> Matrix<T>::index_to_coordinate(std::size_t index) {
 }
 
 template<typename T>
-std::size_t Matrix<T>::coordinate_to_index(std::vector<int64_t>&& coordinates) {
+std::size_t Tensor<T>::coordinate_to_index(std::vector<int64_t>&& coordinates) {
     auto index = std::size_t(0);
     auto accumulator = std::int64_t(1);
     
@@ -138,15 +138,15 @@ std::size_t Matrix<T>::coordinate_to_index(std::vector<int64_t>&& coordinates) {
     return index;
 }
 
-template class Matrix<Domain>;
-template class Matrix<std::uint32_t>;
+template class Tensor<Domain>;
+template class Tensor<std::uint32_t>;
 
 } // namespace wfc::data
 
-std::size_t std::hash<wfc::data::Matrix<std::uint32_t>>::operator()(const wfc::data::Matrix<std::uint32_t>& matrix) const noexcept {
+std::size_t std::hash<wfc::data::Tensor<std::uint32_t>>::operator()(const wfc::data::Tensor<std::uint32_t>& tensor) const noexcept {
     auto h = std::hash<std::uint32_t>();
     auto result = std::size_t(1337);
-    for (const auto& t : matrix.m_data) {
+    for (const auto& t : tensor.m_data) {
         result = result ^ (h(t) << 1ull);
     }
     return result;
