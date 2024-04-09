@@ -106,17 +106,17 @@ int main() {
         
         SDL_UpdateWindowSurface(sdl->window);
 
-         while (SDL_PollEvent(&sdl_event)){
-             if  (sdl_event.type == SDL_EVENT_QUIT) {
-                 running = false;
-             }
+        while (SDL_PollEvent(&sdl_event)){
+            if  (sdl_event.type == SDL_EVENT_QUIT) {
+                running = false;
+            }
          }
 
-         SDL_Delay(1);
+        SDL_Delay(1);
      }
 
-     SDL_DestroyWindow(sdl->window);
-     SDL_Quit();
+    SDL_DestroyWindow(sdl->window);
+    SDL_Quit();
 
     return 0;
 }

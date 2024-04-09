@@ -88,6 +88,9 @@
         "__string": "cpp",
         "fstream": "cpp",
         "charconv": "cpp",
-        "execution": "cpp"
+        "execution": "cpp",
+        "future": "cpp",
+        "list": "cpp",
+        "regex": "cpp"
     }
 }

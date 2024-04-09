@@ -92,7 +92,6 @@ std::vector<std::uint32_t> Image::make_pixels(const data::Matrix<Domain>& variab
                 // and the green component shifted to the appropriate position
                 return std::uint32_t(0xFF000000 | (green << 8));
             } else {
-                std::cout << "hmm" << std::endl;
                 return std::numeric_limits<std::uint32_t>::max();
             }
         }();
