@@ -8,8 +8,8 @@
 
 #include <SDL3/SDL.h>
 
-static constexpr auto screen_width = int(32);
-static constexpr auto screen_height = int(32);
+static constexpr auto screen_width = int(128);
+static constexpr auto screen_height = int(128);
 
 struct SDL {
     SDL_Window* window;
@@ -56,10 +56,10 @@ int main() {
     static constexpr auto output_width = screen_width;
     static constexpr auto output_height = screen_height;
     
-    const auto image_path = std::filesystem::path("/Users/ion/Repos/wfc/assets/images/village.png");
+    const auto image_path = std::filesystem::path("/Users/ion/Repos/wfc/assets/images/flowers.png");
     auto image = std::make_shared<model::Image>(std::move(*model::load_image(image_path)));
     auto config = [image](){
-        // const auto seed = std::int32_t(1337);
+        //  const auto seed = std::int32_t(1337);
         auto random = std::make_shared<io::Random>();
         auto weights = std::make_shared<heuristic::Weights>(image->weights());
         auto sample = std::make_shared<heuristic::assignment::Sample>(weights, random);
@@ -74,13 +74,13 @@ int main() {
     auto wfc = Wfc(std::move(config), std::move(matrix));
     
     auto running = true;
-    while (running) {
-        running = !wfc.step();
-    }
-    running = true;
+//    while (running) {
+//        running = !wfc.step();
+//    }
+//    running = true;
     
-    const auto& xs = wfc.variables();
-    auto pixels = image->make_pixels(xs);
+//    const auto& xs = wfc.variables();
+//    auto pixels = image->make_pixels(xs);
 
     auto sdl = setup_sdl();
     if (!sdl) {
@@ -91,7 +91,9 @@ int main() {
     auto sdl_event = SDL_Event();
 
     while (running) {
-        if (SDL_LockSurface(surface) == 0) {
+        if (!wfc.step() && SDL_LockSurface(surface) == 0) {
+            const auto& xs = wfc.variables();
+            auto pixels = image->make_pixels(xs);
             auto* screen_pixels = static_cast<uint32_t*>(surface->pixels);
             for (int y = 0; y < output_width; y++) {
                 for (int x = 0; x < output_height; x++) {

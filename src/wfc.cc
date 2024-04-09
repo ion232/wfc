@@ -17,9 +17,9 @@ Wfc::Wfc(Config&& config, data::Matrix<Domain>&& variables)
 }
 
 bool Wfc::step() {
-     static auto steps = std::size_t(0);
+    //  static auto steps = std::size_t(0);
     
-     std::cout << "Steps: " << std::to_string(steps++) << std::endl;
+    //  std::cout << "Steps: " << std::to_string(steps++) << std::endl;
 
     if (resolved()) {
         return true;
@@ -51,7 +51,7 @@ bool Wfc::constrain() {
         return true;
     }
     domain.assign(*id);
-     std::cout << "Assigned id " << std::to_string(*id) << " to index " << std::to_string(*index) << std::endl;
+    //  std::cout << "Assigned id " << std::to_string(*id) << " to index " << std::to_string(*index) << std::endl;
 
     m_variables_assigned++;
     m_config.variable_heuristic->inform(*index, domain);
@@ -61,7 +61,10 @@ bool Wfc::constrain() {
 }
 
 bool Wfc::propagate() {
+    // auto propagated = std::size_t(0);
+
     while (!m_propagation_stack.empty()) {
+        // propagated++;
         const auto& current_index = m_propagation_stack.top();
         auto& current_domain = m_variables[current_index];
         auto adjacent_indices = m_variables.adjacent(current_index);
@@ -86,13 +89,15 @@ bool Wfc::propagate() {
             }
         }
     }
+    // std::cout << "Propagated: " << std::to_string(propagated) << std::endl;
 
     return false;
 }
 
 // TODO: ion232: This could do with being refactored for readability.
 std::vector<IdSet> Wfc::valid_adjacencies(const IdSet& ids) {
-    static auto adjacencies = std::vector<IdSet>(8, IdSet(ids.capacity() - 1));
+    static auto adjacencies = std::vector<IdSet>(8, IdSet(300));
+    // static auto adjacencies = std::vector<IdSet>(8, IdSet());
     for (auto& id_set : adjacencies) {
         id_set.clear();
     }

@@ -92,6 +92,7 @@ std::vector<std::uint32_t> Image::make_pixels(const data::Matrix<Domain>& variab
                 // and the green component shifted to the appropriate position
                 return std::uint32_t(0xFF000000 | (green << 8));
             } else {
+                std::cout << "hmm" << std::endl;
                 return std::numeric_limits<std::uint32_t>::max();
             }
         }();
@@ -119,18 +120,6 @@ std::optional<Image> load_image(std::filesystem::path path) {
             pixels[y + 1][x + 1], // 8
         };
     };
-
-    // TODO: ion232: Sort this magic out.
-    // constexpr auto make_sides = [](const auto& block) -> std::vector<overlap::Side> {
-    //     return {
-    //         {{block[0], block[3], block[5]}},
-    //         {{block[1], block[4], block[7]}},
-    //         {{block[2], block[5], block[8]}},
-    //         {{block[0], block[1], block[2]}},
-    //         {{block[3], block[4], block[5]}},
-    //         {{block[6], block[7], block[8]}},
-    //     };
-    // };
 
     auto unique_patterns = std::unordered_set<overlap::Pattern>();
     auto weights = std::unordered_map<overlap::Pattern, std::size_t>();
