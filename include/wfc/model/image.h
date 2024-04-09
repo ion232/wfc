@@ -2,6 +2,7 @@
 
 #include "wfc/variable.h"
 #include "wfc/data/tensor.h"
+#include "wfc/interface/image/loader.h"
 #include "wfc/interface/model.h"
 
 #include <cstdint>
@@ -32,9 +33,7 @@ public:
     Model::Weights weights() override;
     Variable initial_variable() override;
 
-    std::vector<std::uint32_t> make_pixels(const data::Tensor<Variable>& tensor);
+    std::vector<std::uint32_t> make_pixels(const data::Tensor<Variable>& variables);
 };
-
-std::optional<Image> load_image(std::filesystem::path path);
 
 } // namespace wfc::model

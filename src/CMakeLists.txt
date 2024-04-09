@@ -1,5 +1,6 @@
 add_subdirectory(data)
 add_subdirectory(heuristic)
+add_subdirectory(image)
 add_subdirectory(io)
 add_subdirectory(model)
 
