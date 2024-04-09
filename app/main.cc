@@ -1,5 +1,8 @@
+#include "png_loader.h"
+
 #include "wfc/wfc.h"
 #include "wfc/model/image.h"
+#include "wfc/model/image_factory.h"
 #include "wfc/heuristic/assignment/sample.h"
 #include "wfc/heuristic/variable/entropy.h"
 
@@ -57,8 +60,11 @@ int main() {
     static constexpr auto output_height = screen_height;
     
     const auto image_path = std::filesystem::path("/Users/ion/Repos/wfc/assets/images/flowers.png");
-    auto image = std::make_shared<model::Image>(std::move(*model::load_image(image_path)));
-    auto config = [image](){
+    auto png_loader = std::make_shared<image::PngLoader>();
+    auto image_factory =  model::ImageFactory(png_loader);
+    auto image = image_factory.make_image(image_path);
+
+    auto config = [&image](){
         //  const auto seed = std::int32_t(1337);
         auto random = std::make_shared<io::Random>();
         auto weights = std::make_shared<heuristic::Weights>(image->weights());
