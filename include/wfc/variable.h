@@ -10,13 +10,13 @@
 
 namespace wfc {
 
-class Domain {
+class Variable {
 private:
     IdMap<std::size_t> m_map;
 
 public:
-    Domain();
-    Domain(IdMap<std::size_t>&& map);
+    Variable();
+    Variable(IdMap<std::size_t>&& map);
 
     void assign(Id id);
     bool constrain_to(const IdSet& allowed);
@@ -24,7 +24,7 @@ public:
     IdSet ids() const noexcept;
     std::size_t size() const noexcept;
 
-    bool operator==(const Domain& other) const;
+    bool operator==(const Variable& other) const;
 };
 
 } // namespace wfc

@@ -5,7 +5,7 @@
 
 namespace wfc {
 
-Wfc::Wfc(Config&& config, data::Tensor<Domain>&& variables)
+Wfc::Wfc(Config&& config, data::Tensor<Variable>&& variables)
     : m_config(std::move(config))
     , m_variables(std::move(variables))
     , m_variables_assigned(0)
@@ -36,7 +36,7 @@ bool Wfc::step() {
     return false;
 }
 
-data::Tensor<Domain>& Wfc::variables() {
+data::Tensor<Variable>& Wfc::variables() {
     return m_variables;
 }
 
@@ -45,16 +45,16 @@ bool Wfc::constrain() {
     if (!index) {
         return true;
     }
-    auto& domain = m_variables[*index];
-    auto id = m_config.assignment_heuristic->choose_from(domain.ids());
+    auto& variable = m_variables[*index];
+    auto id = m_config.assignment_heuristic->choose_from(variable.ids());
     if (!id) {
         return true;
     }
-    domain.assign(*id);
+    variable.assign(*id);
     //  std::cout << "Assigned id " << std::to_string(*id) << " to index " << std::to_string(*index) << std::endl;
 
     m_variables_assigned++;
-    m_config.variable_heuristic->inform(*index, domain);
+    m_config.variable_heuristic->inform(*index, variable);
     m_propagation_stack.push(std::move(*index));
 
     return false;
@@ -66,9 +66,9 @@ bool Wfc::propagate() {
     while (!m_propagation_stack.empty()) {
         // propagated++;
         const auto& current_index = m_propagation_stack.top();
-        auto& current_domain = m_variables[current_index];
+        auto& current_variable = m_variables[current_index];
         auto adjacent_indices = m_variables.adjacent(current_index);
-        auto valid_ids = valid_adjacencies(current_domain.ids());
+        auto valid_ids = valid_adjacencies(current_variable.ids());
         m_propagation_stack.pop();
 
         for (std::size_t i = 0; i < adjacent_indices.size(); i++) {
@@ -76,15 +76,15 @@ bool Wfc::propagate() {
             if (!index) {
                 continue;
             }
-            auto& domain = m_variables[*index];
+            auto& variable = m_variables[*index];
 
-            if (auto changed = domain.constrain_to(valid_ids[i])) {
-                if (domain.size() == 0) {
+            if (auto changed = variable.constrain_to(valid_ids[i])) {
+                if (variable.size() == 0) {
                     return true;
-                } else if (domain.size() == 1) {
+                } else if (variable.size() == 1) {
                     m_variables_assigned += 1;
                 }
-                m_config.variable_heuristic->inform(*index, domain);
+                m_config.variable_heuristic->inform(*index, variable);
                 m_propagation_stack.push(std::move(*index));
             }
         }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "wfc/domain.h"
+#include "wfc/variable.h"
 #include "wfc/data/tensor.h"
 #include "wfc/io/random.h"
 #include "wfc/interface/model.h"
@@ -24,14 +24,14 @@ public:
 
 private:
     Config m_config;
-    data::Tensor<Domain> m_variables;
+    data::Tensor<Variable> m_variables;
     std::size_t m_variables_assigned;
     std::stack<std::size_t, std::vector<std::size_t>> m_propagation_stack;
 
 public:
-    Wfc(Config&& config, data::Tensor<Domain>&& variables);
+    Wfc(Config&& config, data::Tensor<Variable>&& variables);
 
-    data::Tensor<Domain>& variables();
+    data::Tensor<Variable>& variables();
 
     bool step();
 

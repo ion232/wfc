@@ -71,13 +71,13 @@ Image::Weights Image::weights() {
     return m_weights;
 }
 
-Domain Image::initial_domain() {
+Variable Image::initial_variable() {
     auto map = m_support_counts;
-    auto domain = Domain(std::move(map));
-    return domain;
+    auto variable = Variable(std::move(map));
+    return variable;
 }
 
-std::vector<std::uint32_t> Image::make_pixels(const data::Tensor<Domain>& variables) {
+std::vector<std::uint32_t> Image::make_pixels(const data::Tensor<Variable>& variables) {
     auto pixels = std::vector<std::uint32_t>();
 
     for (std::size_t index = 0; index < variables.size(); index++) {

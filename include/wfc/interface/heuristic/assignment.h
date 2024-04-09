@@ -1,6 +1,6 @@
 #pragma once
 
-#include "wfc/domain.h"
+#include "wfc/variable.h"
 #include "wfc/id.h"
 
 #include <optional>

@@ -33,13 +33,13 @@ Entropy::Entropy(
     , m_undecided()
 {}
 
-void Entropy::inform(std::size_t index, const Domain& domain) {
+void Entropy::inform(std::size_t index, const wfc::Variable& variable) {
     if (auto it = m_undecided.find(index); it != m_undecided.end()) {
         m_undecided.erase(it);
     }
     
-    if (domain.size() >= 2) {
-        auto weights = m_weights->of(domain.ids());
+    if (variable.size() >= 2) {
+        auto weights = m_weights->of(variable.ids());
         auto entropy = calculate_entropy(std::move(weights));
         m_undecided[index] = entropy;
     }

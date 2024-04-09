@@ -25,7 +25,7 @@ public:
         std::shared_ptr<io::Random> random
     );
 
-    void inform(std::size_t index, const Domain& domain) override;
+    void inform(std::size_t index, const wfc::Variable& variable) override;
 
     std::optional<std::size_t> pick_variable() override;
 };

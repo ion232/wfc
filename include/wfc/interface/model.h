@@ -1,7 +1,7 @@
 #pragma once
 
 #include "wfc/id.h"
-#include "wfc/domain.h"
+#include "wfc/variable.h"
 
 #include <unordered_set>
 #include <unordered_map>
@@ -17,7 +17,7 @@ public:
     virtual Adjacencies& lookup(Id id) = 0;
     virtual std::size_t adjacent_count() = 0;
     virtual Weights weights() = 0;
-    virtual Domain initial_domain() = 0;
+    virtual Variable initial_variable() = 0;
 };
 
 } // namespace wfc::model

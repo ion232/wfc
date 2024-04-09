@@ -1,4 +1,4 @@
-#include "wfc/domain.h"
+#include "wfc/variable.h"
 #include "wfc/data/tensor.h"
 
 #include <iostream>
@@ -138,7 +138,7 @@ std::size_t Tensor<T>::coordinate_to_index(std::vector<int64_t>&& coordinates) {
     return index;
 }
 
-template class Tensor<Domain>;
+template class Tensor<Variable>;
 template class Tensor<std::uint32_t>;
 
 } // namespace wfc::data
