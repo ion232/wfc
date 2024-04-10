@@ -9,6 +9,7 @@ static const auto base_image_path = std::filesystem::path("./assets/images");
 int main(int argc, const char* argv[]) {
     if (argc != 4) {
         std::cout << "Usage: ./app image_name width height" << std::endl;
+        return;
     }
 
     auto app = [argv](){
