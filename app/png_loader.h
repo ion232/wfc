@@ -6,7 +6,7 @@ namespace wfc::image {
 
 class PngLoader: public interface::Loader {
 public:
-    Pixels load_pixels(const std::filesystem::path& path) override;
+    PngLoader::Pixels load_pixels(const std::filesystem::path& path) override;
 };
 
 } // namespace wfc::image

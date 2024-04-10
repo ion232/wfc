@@ -44,13 +44,15 @@ private:
     std::size_t m_size;
 
 public:
+    IdSet();
     IdSet(Id max_id);
 
     void insert(const Id& id);
     void remove(const Id& id);
-
     void clear();
+
     bool contains(const Id& id) const;
+
     std::size_t capacity() const;
     std::size_t size() const;
 

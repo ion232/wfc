@@ -4,7 +4,7 @@
 #include "wfc/model/image.h"
 #include "wfc/model/image_factory.h"
 #include "wfc/heuristic/assignment/sample.h"
-#include "wfc/heuristic/variable/entropy.h"
+#include "wfc/heuristic/choice/entropy.h"
 
 #include <iostream>
 #include <optional>
@@ -65,36 +65,26 @@ int main() {
     auto image = image_factory.make_image(image_path);
 
     auto config = [&image](){
-        //  const auto seed = std::int32_t(1337);
         auto random = std::make_shared<io::Random>();
         auto weights = std::make_shared<heuristic::Weights>(image->weights());
         auto sample = std::make_shared<heuristic::assignment::Sample>(weights, random);
-        auto entropy = std::make_shared<heuristic::variable::Entropy>(weights, random);
+        auto entropy = std::make_shared<heuristic::choice::Entropy>(weights, random);
         return Wfc::Config{sample, entropy, image, random};
     }();
     auto dimensions = std::vector<std::size_t>({output_width, output_height});
     auto tensor = data::Tensor<Variable>(
-                                       std::move(dimensions),
-                                       Variable(image->initial_variable())
-                                       );
+        std::move(dimensions),
+        Variable(image->initial_variable())
+    );
     auto wfc = Wfc(std::move(config), std::move(tensor));
-    
-    auto running = true;
-//    while (running) {
-//        running = !wfc.step();
-//    }
-//    running = true;
-    
-//    const auto& xs = wfc.variables();
-//    auto pixels = image->make_pixels(xs);
 
     auto sdl = setup_sdl();
     if (!sdl) {
-        return 1;
+        return EXIT_FAILURE;
     }
-    
     auto* surface = SDL_GetWindowSurface(sdl->window);
     auto sdl_event = SDL_Event();
+    auto running = true;
 
     while (running) {
         if (!wfc.step() && SDL_LockSurface(surface) == 0) {
@@ -116,10 +106,10 @@ int main() {
             if  (sdl_event.type == SDL_EVENT_QUIT) {
                 running = false;
             }
-         }
+        }
 
         SDL_Delay(1);
-     }
+    }
 
     SDL_DestroyWindow(sdl->window);
     SDL_Quit();

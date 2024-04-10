@@ -43,12 +43,20 @@ void IdSet::iterator::advance() {
     }
 }
 
+IdSet::IdSet()
+    : m_data()
+    , m_size(0)
+{}
+
 IdSet::IdSet(Id max_id)
     : m_data(max_id + 1, false)
     , m_size(0)
 {}
 
 void IdSet::insert(const Id& id) {
+    if (id >= m_data.size()) {
+        m_data.resize(id + 1, false);
+    }
     m_size += static_cast<std::size_t>(!m_data[id]);
     m_data[id] = true;
 }

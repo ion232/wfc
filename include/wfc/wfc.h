@@ -5,7 +5,7 @@
 #include "wfc/io/random.h"
 #include "wfc/interface/model.h"
 #include "wfc/interface/heuristic/assignment.h"
-#include "wfc/interface/heuristic/variable.h"
+#include "wfc/interface/heuristic/choice.h"
 
 #include <memory>
 #include <stack>
@@ -17,7 +17,7 @@ class Wfc {
 public:
     struct Config {
         std::shared_ptr<heuristic::interface::Assignment> assignment_heuristic;
-        std::shared_ptr<heuristic::interface::Variable> variable_heuristic;
+        std::shared_ptr<heuristic::interface::Choice> choice_heuristic;
         std::shared_ptr<model::interface::Model> model;
         std::shared_ptr<io::Random> random;
     };

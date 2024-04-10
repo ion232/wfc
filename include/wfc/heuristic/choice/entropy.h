@@ -2,17 +2,17 @@
 
 #include "wfc/heuristic/weights.h"
 #include "wfc/io/random.h"
-#include "wfc/interface/heuristic/variable.h"
+#include "wfc/interface/heuristic/choice.h"
 
 #include <memory>
 #include <optional>
 #include <unordered_map>
 #include <utility>
 
-namespace wfc::heuristic::variable {
+namespace wfc::heuristic::choice {
 
 // TODO: ion232: Need to find a more performant way of doing this. This will do for now.
-class Entropy: public interface::Variable {
+class Entropy: public interface::Choice {
 private:
     std::shared_ptr<Weights> m_weights;
     std::shared_ptr<io::Random> m_random;
@@ -27,7 +27,7 @@ public:
 
     void inform(std::size_t index, const wfc::Variable& variable) override;
 
-    std::optional<std::size_t> pick_variable() override;
+    std::optional<std::size_t> choose() override;
 };
 
-} // namespace wfc::heuristic::variable
+} // namespace wfc::heuristic::choice

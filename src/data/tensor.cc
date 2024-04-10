@@ -71,26 +71,6 @@ std::vector<std::optional<std::size_t>> Tensor<T>::adjacent(std::size_t index) {
         auto adjacent_index = static_cast<std::size_t>(coordinate_to_index(std::move(*coord)));
         adjacent_indices.emplace_back(std::move(adjacent_index));
     }
-    
-//    for (std::size_t i = 0; i < coordinate.size(); i++) {
-//        for (std::int64_t offset : {-1, 0, 1}) {
-//
-//
-//            auto adjacent_coordinate = coordinate;
-//            adjacent_coordinate[i] = (adjacent_coordinate[i] + offset);
-//            auto adjacent_index = coordinate_to_index(std::move(adjacent_coordinate));
-//            adjacent_indices.emplace_back(std::move(adjacent_index));
-//        }
-//    }
-
-//    auto result = std::vector<std::optional<std::size_t>>();
-//    for (auto& i : adjacent_indices) {
-//        if (i && *i >= 0) {
-//            result.emplace_back(*i);
-//        } else {
-//            result.emplace_back(std::nullopt);
-//        }
-//    }
 
     return adjacent_indices;
 }

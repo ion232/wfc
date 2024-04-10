@@ -14,10 +14,11 @@ public:
     using Weights = IdMap<std::size_t>;
 
     virtual ~Model() {};
-    virtual Adjacencies& lookup(Id id) = 0;
-    virtual std::size_t adjacent_count() = 0;
-    virtual Weights weights() = 0;
+
     virtual Variable initial_variable() = 0;
+    virtual Adjacencies& adjacencies(Id id) = 0;
+    virtual std::size_t adjacency_count() const noexcept = 0;
+    virtual Weights weights() = 0;
 };
 
 } // namespace wfc::model

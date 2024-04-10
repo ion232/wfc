@@ -32,22 +32,37 @@ bool Variable::constrain_to(const IdSet& allowed) {
         }
     }
 
+    auto changed = to_remove.size() > 0;
+
     for (const auto& id : to_remove) {
         m_map.erase(id);
     }
 
-    auto changed = to_remove.size() > 0;
     return changed;
 }
 
 IdSet Variable::ids() const noexcept {
-    auto ids = IdSet(300);
+    auto ids = IdSet(m_map.size());
+
     for (const auto& [id, count] : m_map) {
         if (count != 0) {
             ids.insert(id);
         }
     }
+
     return ids;
+}
+
+Variable::State Variable::state() const noexcept {
+    const auto count = size();
+
+    if (count == 0) {
+        return State::Invalid;
+    } else if (count == 1) {
+        return State::Decided;
+    } else {
+        return State::Undecided;
+    }
 }
 
 std::size_t Variable::size() const noexcept {

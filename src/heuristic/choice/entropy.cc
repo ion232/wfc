@@ -1,8 +1,8 @@
-#include "wfc/heuristic/variable/entropy.h"
+#include "wfc/heuristic/choice/entropy.h"
 
 #include <limits>
 
-namespace wfc::heuristic::variable {
+namespace wfc::heuristic::choice {
 namespace {
     float calculate_entropy(std::vector<std::size_t>&& weights) {
        auto entropy = float(0);
@@ -38,14 +38,14 @@ void Entropy::inform(std::size_t index, const wfc::Variable& variable) {
         m_undecided.erase(it);
     }
     
-    if (variable.size() >= 2) {
+    if (variable.state() == wfc::Variable::State::Undecided) {
         auto weights = m_weights->of(variable.ids());
         auto entropy = calculate_entropy(std::move(weights));
         m_undecided[index] = entropy;
     }
 }
 
-std::optional<std::size_t> Entropy::pick_variable() {
+std::optional<std::size_t> Entropy::choose() {
     auto variable_indices = std::vector<std::size_t>();
     auto min_entropy = std::numeric_limits<float>::max();
 
@@ -75,4 +75,4 @@ std::optional<std::size_t> Entropy::pick_variable() {
     return variable_index;
 }
 
-} // namespace wfc::heuristic::variable
+} // namespace wfc::heuristic::choice

@@ -4,14 +4,19 @@
 
 namespace wfc::image {
 
+using Byte = std::uint8_t;
+
 struct Pixel {
-    std::uint8_t a;
-    std::uint8_t r;
-    std::uint8_t g;
-    std::uint8_t b;
+    Byte r;
+    Byte g;
+    Byte b;
+    Byte a;
 };
 
+Pixel make_pixel(Byte r, Byte g, Byte b, Byte a);
 Pixel make_pixel(std::uint32_t pixel);
-std::uint32_t make_pixel(const Pixel& pixel);
+
+std::uint32_t rgba(const Pixel& pixel);
+std::uint32_t argb(const Pixel& pixel);
 
 } // namespace wfc::image

@@ -10,7 +10,7 @@ Sample::Sample(
     , m_random(std::move(random))
 {}
 
-std::optional<Id> Sample::choose_from(const IdSet& ids) {
+std::optional<Id> Sample::assign_from(const IdSet& ids) {
     const auto weights = m_weights->of(ids);
 
     auto total = std::size_t(0);

@@ -28,8 +28,8 @@ public:
         IdMap<std::size_t> support_counts
     );
 
-    Model::Adjacencies& lookup(Id id) override;
-    std::size_t adjacent_count() override;
+    Model::Adjacencies& adjacencies(Id id) override;
+    std::size_t adjacency_count() const noexcept override;
     Model::Weights weights() override;
     Variable initial_variable() override;
 
