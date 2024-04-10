@@ -33,7 +33,7 @@ Image::Weights Image::weights() {
     return m_weights;
 }
 
-Variable Image::initial_variable() {
+Variable Image::make_variable() {
     auto map = m_support_counts;
     auto variable = Variable(std::move(map));
     return variable;

@@ -2,11 +2,11 @@
 
 #include "lodepng.h"
 
-namespace wfc::image {
+namespace app {
 
-class PngLoader: public interface::Loader {
+class PngLoader: public wfc::image::interface::Loader {
 public:
     PngLoader::Pixels load_pixels(const std::filesystem::path& path) override;
 };
 
-} // namespace wfc::image
+} // namespace app

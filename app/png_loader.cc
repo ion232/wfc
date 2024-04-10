@@ -2,7 +2,7 @@
 
 #include "lodepng.h"
 
-namespace wfc::image {
+namespace app {
 
 PngLoader::Pixels PngLoader::load_pixels(const std::filesystem::path& path) {
     static const auto throw_error = [](const auto& message, auto error){
@@ -26,7 +26,7 @@ PngLoader::Pixels PngLoader::load_pixels(const std::filesystem::path& path) {
     pixels.reserve(height);
 
     for (std::size_t y = 0; y < height; y++) {
-        auto row = std::vector<Pixel>();
+        auto row = std::vector<wfc::image::Pixel>();
         row.reserve(width);
 
         for (std::size_t x = 0; x < width; x++) {
@@ -37,7 +37,8 @@ PngLoader::Pixels PngLoader::load_pixels(const std::filesystem::path& path) {
             const auto b = static_cast<std::uint8_t>(raw_data[raw_index++]);
             const auto a = static_cast<std::uint8_t>(raw_data[raw_index++]);
 
-            row.emplace_back(make_pixel(r, g, b, a));
+            auto pixel = wfc::image::make_pixel(r, g, b, a);
+            row.emplace_back(std::move(pixel));
         }
 
         pixels.emplace_back(std::move(row));
@@ -46,4 +47,4 @@ PngLoader::Pixels PngLoader::load_pixels(const std::filesystem::path& path) {
     return pixels;
 }
 
-} // namespace wfc::image
+} // namespace app

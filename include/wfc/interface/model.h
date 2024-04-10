@@ -15,7 +15,7 @@ public:
 
     virtual ~Model() {};
 
-    virtual Variable initial_variable() = 0;
+    virtual Variable make_variable() = 0;
     virtual Adjacencies& adjacencies(Id id) = 0;
     virtual std::size_t adjacency_count() const noexcept = 0;
     virtual Weights weights() = 0;
