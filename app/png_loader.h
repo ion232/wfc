@@ -1,3 +1,5 @@
+#pragma once
+
 #include "wfc/interface/image/loader.h"
 
 #include "lodepng.h"

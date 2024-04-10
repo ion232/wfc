@@ -17,16 +17,16 @@ build() {
 
     readonly threads=$(sysctl -n hw.ncpu)
 
-    cmake -DCMAKE_BUILD_TYPE=$cmake_build_type -G$cmake_generator -B build -S .
+    cmake -DCMAKE_BUILD_TYPE=$cmake_build_type -G$cmake_generator -B $build_dir -S .
     cmake --build "$build_dir" "-j$threads"
 }
 
 run() {
     readonly app="./$build_dir/$app_name"
     if [ "$cmake_generator" == "Ninja" ]; then
-        app
+        $app flowers 128 128
     elif [ "$cmake_generator" == "Unix Makefiles" ]; then
-        app
+        $app flowers 128 128
     elif [ "$cmake_generator" == "Xcode" ]; then
         open "$build_dir/$project_name.xcodeproj"
     else

@@ -5,8 +5,9 @@
 namespace app {
 
 PngLoader::Pixels PngLoader::load_pixels(const std::filesystem::path& path) {
-    static const auto throw_error = [](const auto& message, auto error){
-        throw std::runtime_error(message + std::to_string(error));
+    static const auto throw_error = [](const auto& stub, auto error){
+        auto message = std::string(stub) + lodepng_error_text(error);
+        throw std::runtime_error(std::move(message));
     };
 
     auto png = std::vector<unsigned char>();

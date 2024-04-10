@@ -11,14 +11,23 @@
 
 namespace app {
 namespace {
-    void log_sdl_error() {
-        std::cout << "SDL error: " << SDL_GetError() << std::endl;
+    void log(const std::string& message) {
+        std::cout << "[app]" << message << std::endl;
     }
 
-    SDL_Window* make_window(int width, int height) {
+    void log_sdl_error() {
+        log("SDL error: " + std::string(SDL_GetError()));
+    }
+
+    SDL_Window* make_window(std::size_t width, std::size_t height) {
         static constexpr auto no_window_flags = SDL_WindowFlags(0);
 
-        auto* window = SDL_CreateWindow("ion232/wfc", width, height, no_window_flags);
+        auto* window = SDL_CreateWindow(
+            "ion232/wfc_app",
+            static_cast<int>(width),
+            static_cast<int>(height),
+            no_window_flags
+        );
         if (window == nullptr) {
             log_sdl_error();
             return nullptr;
@@ -62,16 +71,19 @@ int App::run() {
 
     auto* window = make_window(width, height);
     if (window == nullptr) {
+        log("Failed to make window.");
         return EXIT_FAILURE;
     }
 
     auto* surface = SDL_GetWindowSurface(window);
     if (surface == nullptr) {
+        log("Window surface is null.");
         return EXIT_FAILURE;
     }
 
     auto* screen_pixels = static_cast<uint32_t*>(surface->pixels);
     if (screen_pixels == nullptr) {
+        log("Screen pixels are null.");
         return EXIT_FAILURE;
     }
 

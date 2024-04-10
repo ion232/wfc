@@ -87,12 +87,13 @@ bool Wfc::propagate() {
 }
 
 std::vector<IdSet> Wfc::valid_adjacencies(const IdSet& ids) {
-    auto adjacencies = std::vector<IdSet>();
-    adjacencies.reserve(m_config.model->adjacency_count());
+    auto adjacencies = std::vector<IdSet>(
+        m_config.model->adjacency_count(),
+        IdSet(ids.capacity() + 1)
+    );
 
     for (const auto& id : ids) {
         const auto& valid_adjacent_ids = m_config.model->adjacencies(id);
-        adjacencies.emplace_back(ids.capacity() - 1);
         for (std::size_t i = 0; i < valid_adjacent_ids.size(); i++) {
             for (const auto& [valid_id, count] : valid_adjacent_ids[i]) {
                 std::ignore = count;

@@ -62,12 +62,15 @@ void IdSet::insert(const Id& id) {
 }
 
 void IdSet::remove(const Id& id) {
+    if (id >= m_data.size()) {
+        return;
+    }
     m_size -= static_cast<std::size_t>(m_data[id]);
     m_data[id] = false;
 }
 
 bool IdSet::contains(const Id& id) const {
-    return m_data[id];
+    return (id < m_data.size()) && m_data[id];
 }
 
 void IdSet::clear() {

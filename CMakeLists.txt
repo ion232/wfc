@@ -18,7 +18,28 @@ target_link_options(wfc PRIVATE
 )
 
 add_executable(wfc_app)
+target_compile_options(wfc_app PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+    -Werror
+    # -fsanitize=address,undefined,float-divide-by-zero,unsigned-integer-overflow,implicit-conversion,local-bounds
+)
+target_link_options(wfc_app PRIVATE
+    # -fsanitize=address,undefined,float-divide-by-zero,unsigned-integer-overflow,implicit-conversion,local-bounds
+)
+
 add_executable(wfc_unit_tests)
+target_compile_options(wfc_unit_tests PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+    -Werror
+    # -fsanitize=address,undefined,float-divide-by-zero,unsigned-integer-overflow,implicit-conversion,local-bounds
+)
+target_link_options(wfc_unit_tests PRIVATE
+    # -fsanitize=address,undefined,float-divide-by-zero,unsigned-integer-overflow,implicit-conversion,local-bounds
+)
 
 include_directories(include)
 include_directories(external/lodepng)
