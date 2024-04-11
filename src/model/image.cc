@@ -21,19 +21,19 @@ Image::Image(
     , m_support_counts(std::move(support_counts))
 {}
 
-Image::Adjacencies& Image::lookup(Id id) {
+Image::Adjacencies& Image::adjacencies(Id id) {
     return m_adjacencies[id];
 }
 
-std::size_t Image::adjacent_count() {
-    return 8;
+std::size_t Image::adjacency_count() const noexcept {
+    return m_adjacencies.begin()->size();
 }
 
 Image::Weights Image::weights() {
     return m_weights;
 }
 
-Variable Image::initial_variable() {
+Variable Image::make_variable() {
     auto map = m_support_counts;
     auto variable = Variable(std::move(map));
     return variable;

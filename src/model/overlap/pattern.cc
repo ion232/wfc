@@ -54,6 +54,6 @@ bool Pattern::operator==(const Pattern& other) const {
 std::size_t std::hash<wfc::model::overlap::Pattern>::operator()(const wfc::model::overlap::Pattern& pattern) const noexcept {
     auto h = std::hash<wfc::data::Tensor<std::uint32_t>>();
     auto result = std::size_t(1337);
-    result = result ^ (h(pattern.m_tensor) << 1ull);
+    result = result ^ (h(pattern.m_tensor) << 1);
     return result;
 }

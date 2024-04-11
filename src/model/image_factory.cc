@@ -14,15 +14,15 @@ std::shared_ptr<Image> ImageFactory::make_image(const std::filesystem::path& pat
     // TODO: ion232: Sort out code relating to adjacency count, etc.
     constexpr auto make_block = [](const auto& pixels, const auto x, const auto y) -> std::vector<std::uint32_t> {
         return {
-            make_pixel(pixels[y - 1][x - 1]), // 0
-            make_pixel(pixels[y - 1][x]), // 1
-            make_pixel(pixels[y - 1][x + 1]), // 2
-            make_pixel(pixels[y][x - 1]), // 3
-            make_pixel(pixels[y][x]), // 4
-            make_pixel(pixels[y][x + 1]), // 5
-            make_pixel(pixels[y + 1][x - 1]), // 6
-            make_pixel(pixels[y + 1][x]), // 7
-            make_pixel(pixels[y + 1][x + 1]), // 8
+            argb(pixels[y - 1][x - 1]), // 0
+            argb(pixels[y - 1][x]), // 1
+            argb(pixels[y - 1][x + 1]), // 2
+            argb(pixels[y][x - 1]), // 3
+            argb(pixels[y][x]), // 4
+            argb(pixels[y][x + 1]), // 5
+            argb(pixels[y + 1][x - 1]), // 6
+            argb(pixels[y + 1][x]), // 7
+            argb(pixels[y + 1][x + 1]), // 8
         };
     };
 
@@ -34,7 +34,7 @@ std::shared_ptr<Image> ImageFactory::make_image(const std::filesystem::path& pat
             auto block = make_block(pixels, x, y);
             // TODO: ion232: More magic to refactor.
             auto tensor = data::Tensor<std::uint32_t>({3, 3}, std::move(block));
-            auto value = make_pixel(pixels[y][x]);
+            auto value = argb(pixels[y][x]);
             auto pattern = overlap::Pattern(std::move(tensor), value);
             if (!weights.contains(pattern)) {
                 weights.insert({pattern, 0});
@@ -80,7 +80,6 @@ std::shared_ptr<Image> ImageFactory::make_image(const std::filesystem::path& pat
             for (std::size_t i = 0; i < valid_adjacencies.size(); i++) {
                 const auto is_valid = valid_adjacencies[i];
                 if (is_valid) {
-//                    support_map[id1] += 1;
                     if (!adjacencies1[i].contains(id2)) {
                         adjacencies1[i][id2] = 1;
                     } else {

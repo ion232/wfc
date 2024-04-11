@@ -1,128 +1,26 @@
-#include "png_loader.h"
-
-#include "wfc/wfc.h"
-#include "wfc/model/image.h"
-#include "wfc/model/image_factory.h"
-#include "wfc/heuristic/assignment/sample.h"
-#include "wfc/heuristic/variable/entropy.h"
+#include "app.h"
 
 #include <iostream>
-#include <optional>
 
 #include <SDL3/SDL.h>
 
-static constexpr auto screen_width = int(128);
-static constexpr auto screen_height = int(128);
+static const auto base_image_path = std::filesystem::path("../../assets/images");
 
-struct SDL {
-    SDL_Window* window;
-};
-
-std::optional<SDL> setup_sdl() {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        std::cout << "SDL error: " << SDL_GetError() << std::endl;
-        return std::nullopt;
+int main(int argc, const char* argv[]) {
+    if (argc != 4) {
+        std::cout << "Usage: ./app image_name width height" << std::endl;
+        return EXIT_FAILURE;
     }
 
-    static constexpr auto no_window_flags = SDL_WindowFlags(0);
-    auto* window = SDL_CreateWindow("SDL Tutorial", screen_width, screen_height, no_window_flags);
-    if (window == nullptr) {
-        std::cout << "SDL error: " << SDL_GetError() << std::endl;
-        return std::nullopt;
-    }
-
-    auto* screen_surface = SDL_GetWindowSurface(window);
-    if (screen_surface == nullptr) {
-        std::cout << "SDL error: " << SDL_GetError() << std::endl;
-        return std::nullopt;
-    }
-
-    const auto pixel_color = SDL_MapRGB(screen_surface->format, 0xAA, 0xAA, 0xAA);
-    if (SDL_FillSurfaceRect(screen_surface, nullptr, pixel_color) != 0) {
-        std::cout << "SDL error: " << SDL_GetError() << std::endl;
-        return std::nullopt;
-    }
-
-    if (SDL_UpdateWindowSurface(window) != 0) {
-        std::cout << "SDL error: " << SDL_GetError() << std::endl;
-        return std::nullopt;
-    }
-
-    auto sdl = SDL{window};
-
-    return sdl;
-}
-
-int main() {
-    using namespace wfc;
-    
-    static constexpr auto output_width = screen_width;
-    static constexpr auto output_height = screen_height;
-    
-    const auto image_path = std::filesystem::path("/Users/ion/Repos/wfc/assets/images/flowers.png");
-    auto png_loader = std::make_shared<image::PngLoader>();
-    auto image_factory =  model::ImageFactory(png_loader);
-    auto image = image_factory.make_image(image_path);
-
-    auto config = [&image](){
-        //  const auto seed = std::int32_t(1337);
-        auto random = std::make_shared<io::Random>();
-        auto weights = std::make_shared<heuristic::Weights>(image->weights());
-        auto sample = std::make_shared<heuristic::assignment::Sample>(weights, random);
-        auto entropy = std::make_shared<heuristic::variable::Entropy>(weights, random);
-        return Wfc::Config{sample, entropy, image, random};
+    auto app = [argv](){
+        auto image_file_name = std::string(argv[1]) + ".png";
+        auto image_path = base_image_path / image_file_name;
+        auto width = std::stoull(argv[2]);
+        auto height = std::stoull(argv[3]);
+        return app::make(image_path, width, height);
     }();
-    auto dimensions = std::vector<std::size_t>({output_width, output_height});
-    auto tensor = data::Tensor<Variable>(
-                                       std::move(dimensions),
-                                       Variable(image->initial_variable())
-                                       );
-    auto wfc = Wfc(std::move(config), std::move(tensor));
-    
-    auto running = true;
-//    while (running) {
-//        running = !wfc.step();
-//    }
-//    running = true;
-    
-//    const auto& xs = wfc.variables();
-//    auto pixels = image->make_pixels(xs);
 
-    auto sdl = setup_sdl();
-    if (!sdl) {
-        return 1;
-    }
-    
-    auto* surface = SDL_GetWindowSurface(sdl->window);
-    auto sdl_event = SDL_Event();
+    auto result = app.run();
 
-    while (running) {
-        if (!wfc.step() && SDL_LockSurface(surface) == 0) {
-            const auto& xs = wfc.variables();
-            auto pixels = image->make_pixels(xs);
-            auto* screen_pixels = static_cast<uint32_t*>(surface->pixels);
-            for (int y = 0; y < output_width; y++) {
-                for (int x = 0; x < output_height; x++) {
-                    screen_pixels[y * screen_width + x] = pixels[y * output_width + x];
-                }
-            }
-
-            SDL_UnlockSurface(surface);
-        }
-        
-        SDL_UpdateWindowSurface(sdl->window);
-
-        while (SDL_PollEvent(&sdl_event)){
-            if  (sdl_event.type == SDL_EVENT_QUIT) {
-                running = false;
-            }
-         }
-
-        SDL_Delay(1);
-     }
-
-    SDL_DestroyWindow(sdl->window);
-    SDL_Quit();
-
-    return 0;
+    return result;
 }

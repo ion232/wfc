@@ -28,10 +28,10 @@ public:
         IdMap<std::size_t> support_counts
     );
 
-    Model::Adjacencies& lookup(Id id) override;
-    std::size_t adjacent_count() override;
+    Model::Adjacencies& adjacencies(Id id) override;
+    std::size_t adjacency_count() const noexcept override;
     Model::Weights weights() override;
-    Variable initial_variable() override;
+    Variable make_variable() override;
 
     std::vector<std::uint32_t> make_pixels(const data::Tensor<Variable>& variables);
 };

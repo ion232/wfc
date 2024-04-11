@@ -1,12 +1,14 @@
+#pragma once
+
 #include "wfc/interface/image/loader.h"
 
 #include "lodepng.h"
 
-namespace wfc::image {
+namespace app {
 
-class PngLoader: public interface::Loader {
+class PngLoader: public wfc::image::interface::Loader {
 public:
-    Pixels load_pixels(const std::filesystem::path& path) override;
+    PngLoader::Pixels load_pixels(const std::filesystem::path& path) override;
 };
 
-} // namespace wfc::image
+} // namespace app

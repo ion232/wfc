@@ -43,23 +43,34 @@ void IdSet::iterator::advance() {
     }
 }
 
+IdSet::IdSet()
+    : m_data()
+    , m_size(0)
+{}
+
 IdSet::IdSet(Id max_id)
     : m_data(max_id + 1, false)
     , m_size(0)
 {}
 
 void IdSet::insert(const Id& id) {
+    if (id >= m_data.size()) {
+        m_data.resize(id + 1, false);
+    }
     m_size += static_cast<std::size_t>(!m_data[id]);
     m_data[id] = true;
 }
 
 void IdSet::remove(const Id& id) {
+    if (id >= m_data.size()) {
+        return;
+    }
     m_size -= static_cast<std::size_t>(m_data[id]);
     m_data[id] = false;
 }
 
 bool IdSet::contains(const Id& id) const {
-    return m_data[id];
+    return (id < m_data.size()) && m_data[id];
 }
 
 void IdSet::clear() {
