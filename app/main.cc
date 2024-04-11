@@ -4,7 +4,7 @@
 
 #include <SDL3/SDL.h>
 
-static const auto base_image_path = std::filesystem::path("../../assets/images");
+static const auto base_image_path = std::filesystem::path("./assets/images");
 
 int main(int argc, const char* argv[]) {
     if (argc != 4) {

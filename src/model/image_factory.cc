@@ -11,18 +11,18 @@ std::shared_ptr<Image> ImageFactory::make_image(const std::filesystem::path& pat
     auto pixels = m_image_loader->load_pixels(path);
 
     // TODO: ion232: Rename everything to match where it ends up. E.g. weights_map -> weights.
-    // TODO: ion232: Sort out code relating to adjacency count, etc.
+    // TODO: ion232: Sort out code relating to constraint count, etc.
     constexpr auto make_block = [](const auto& pixels, const auto x, const auto y) -> std::vector<std::uint32_t> {
         return {
-            argb(pixels[y - 1][x - 1]), // 0
-            argb(pixels[y - 1][x]), // 1
-            argb(pixels[y - 1][x + 1]), // 2
-            argb(pixels[y][x - 1]), // 3
-            argb(pixels[y][x]), // 4
-            argb(pixels[y][x + 1]), // 5
-            argb(pixels[y + 1][x - 1]), // 6
-            argb(pixels[y + 1][x]), // 7
-            argb(pixels[y + 1][x + 1]), // 8
+            argb(pixels[y - 1][x - 1]),
+            argb(pixels[y - 1][x]),
+            argb(pixels[y - 1][x + 1]),
+            argb(pixels[y][x - 1]),
+            argb(pixels[y][x]),
+            argb(pixels[y][x + 1]),
+            argb(pixels[y + 1][x - 1]),
+            argb(pixels[y + 1][x]),
+            argb(pixels[y + 1][x + 1]),
         };
     };
 
@@ -65,34 +65,34 @@ std::shared_ptr<Image> ImageFactory::make_image(const std::filesystem::path& pat
     }
 
     // TODO: ion232: Make this derived or otherwise configurable.
-    static constexpr auto adjacent_count = std::size_t(8);
-    auto adjacency_map = std::vector<Image::Adjacencies>();
+    static constexpr auto constraint_degrees = std::size_t(8);
+    auto constraints_map = std::vector<Image::Constraints>();
     auto support_map = IdMap<std::size_t>();
     for (auto& [id, _] : pattern_map) {
-        adjacency_map.emplace_back(adjacent_count, IdMap<std::size_t>());
+        constraints_map.emplace_back(constraint_degrees, IdMap<std::size_t>());
         support_map.insert({id, 1});
     }
 
     for (auto& [p1, id1] : pattern_to_id) {
-        auto& adjacencies1 = adjacency_map[id1];
+        auto& constraints1 = constraints_map[id1];
+
         for (auto& [p2, id2] : pattern_to_id) { 
-            auto valid_adjacencies = p1.adjacencies(p2);
-            for (std::size_t i = 0; i < valid_adjacencies.size(); i++) {
-                const auto is_valid = valid_adjacencies[i];
-                if (is_valid) {
-                    if (!adjacencies1[i].contains(id2)) {
-                        adjacencies1[i][id2] = 1;
-                    } else {
-                        adjacencies1[i][id2] += 1;
-                    }
+            auto overlaps = p1.overlaps(p2);
+
+            for (std::size_t i = 0; i < overlaps.size(); i++) {
+                if (!overlaps[i]) {
+                    continue;
                 }
+                if (!constraints1[i].contains(id2)) {
+                    constraints1[i][id2] = 0;
+                }
+                constraints1[i][id2] += 1;
             }
-            
         }
     }
 
     auto image = std::make_shared<Image>(
-        std::move(adjacency_map),
+        std::move(constraints_map),
         std::move(weights_map),
         std::move(pixel_map),
         std::move(support_map)

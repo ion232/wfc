@@ -16,7 +16,7 @@ public:
     Pattern(data::Tensor<std::uint32_t>&& tensor, std::uint32_t value);
 
     std::uint32_t value() const;
-    std::vector<bool> adjacencies(const Pattern& other) const;
+    std::vector<bool> overlaps(const Pattern& other) const;
 
     bool operator==(const Pattern& other) const;
 

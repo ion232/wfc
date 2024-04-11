@@ -39,7 +39,7 @@ private:
     bool constrain();
     bool propagate();
 
-    std::vector<IdSet> valid_adjacencies(const IdSet& ids);
+    std::vector<IdSet> constraining_ids(const IdSet& ids);
     bool resolved();
 };
 

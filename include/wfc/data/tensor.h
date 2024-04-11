@@ -20,7 +20,7 @@ public:
 
     T& operator[](std::size_t index);
     const T& operator[](std::size_t index) const;
-    std::vector<std::optional<std::size_t>> adjacent(std::size_t index);
+    std::vector<std::optional<std::size_t>> surrounding(std::size_t index);
     std::vector<std::size_t> dimensions();
     std::size_t size() const;
 

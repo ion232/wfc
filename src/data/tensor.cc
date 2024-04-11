@@ -28,9 +28,9 @@ const T& Tensor<T>::operator[](std::size_t index) const {
     return m_data[index];
 }
 
-// TODO: Make sure this automatically corresponds to the Pattern adjacencies. Deduplicate this knowledge.
+// TODO: Make sure this automatically corresponds to the Pattern constraints. Deduplicate this knowledge.
 template<typename T>
-std::vector<std::optional<std::size_t>> Tensor<T>::adjacent(std::size_t index) {
+std::vector<std::optional<std::size_t>> Tensor<T>::surrounding(std::size_t index) {
     auto coordinate = index_to_coordinate(index);
     
     const auto offsets = std::vector<std::pair<std::int64_t, std::int64_t>>({
@@ -44,7 +44,7 @@ std::vector<std::optional<std::size_t>> Tensor<T>::adjacent(std::size_t index) {
         {-1, 1}
     });
 
-    auto adj_coords = std::vector<std::optional<std::vector<std::int64_t>>>();
+    auto surrounding_coordinates = std::vector<std::optional<std::vector<std::int64_t>>>();
     for (auto& offset : offsets) {
         auto c = coordinate;
         const auto oob_min1 = (c[0] == 0 && offset.second == -1);
@@ -53,26 +53,26 @@ std::vector<std::optional<std::size_t>> Tensor<T>::adjacent(std::size_t index) {
         const auto oob_max2 = (c[1] == (static_cast<int64_t>(m_dimensions[1]) - 1) && offset.first == 1);
 
         if (oob_min1 || oob_max1 || oob_min2 || oob_max2) {
-            adj_coords.emplace_back(std::nullopt);
+            surrounding_coordinates.emplace_back(std::nullopt);
             continue;
         }
         
         c[0] += offset.second;
         c[1] += offset.first;
-        adj_coords.emplace_back(std::move(c));
+        surrounding_coordinates.emplace_back(std::move(c));
     }
     
-    auto adjacent_indices = std::vector<std::optional<std::size_t>>();
-    for (auto& coord : adj_coords) {
-        if (!coord) {
-            adjacent_indices.emplace_back(std::nullopt);
+    auto surrounding_indices = std::vector<std::optional<std::size_t>>();
+    for (auto& coordinate : surrounding_coordinates) {
+        if (!coordinate) {
+            surrounding_indices.emplace_back(std::nullopt);
             continue;
         }
-        auto adjacent_index = static_cast<std::size_t>(coordinate_to_index(std::move(*coord)));
-        adjacent_indices.emplace_back(std::move(adjacent_index));
+        auto index = static_cast<std::size_t>(coordinate_to_index(std::move(*coordinate)));
+        surrounding_indices.emplace_back(std::move(index));
     }
 
-    return adjacent_indices;
+    return surrounding_indices;
 }
 
 template<typename T>
