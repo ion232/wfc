@@ -10,14 +10,14 @@ namespace wfc::model::interface {
 
 class Model {
 public:
-    using Adjacencies = std::vector<IdMap<std::size_t>>;
+    using Constraints = std::vector<IdMap<std::size_t>>;
     using Weights = IdMap<std::size_t>;
 
     virtual ~Model() {};
 
     virtual Variable make_variable() = 0;
-    virtual Adjacencies& adjacencies(Id id) = 0;
-    virtual std::size_t adjacency_count() const noexcept = 0;
+    virtual Constraints& constraints(Id id) = 0;
+    virtual std::size_t constraint_degrees() const noexcept = 0;
     virtual Weights weights() = 0;
 };
 

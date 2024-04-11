@@ -14,7 +14,7 @@ namespace wfc::model {
 
 class Image: public interface::Model {
 private:
-    std::vector<Model::Adjacencies> m_adjacencies;
+    std::vector<Constraints> m_constraints;
     Model::Weights m_weights;
     IdMap<std::uint32_t> m_pixels;
     IdMap<std::size_t> m_support_counts;
@@ -22,15 +22,15 @@ private:
 public:
     Image() = delete;
     Image(
-        std::vector<Model::Adjacencies> adjacencies,
+        std::vector<Constraints> constraints,
         Model::Weights weights,
         IdMap<std::uint32_t> pixels,
         IdMap<std::size_t> support_counts
     );
 
-    Model::Adjacencies& adjacencies(Id id) override;
-    std::size_t adjacency_count() const noexcept override;
-    Model::Weights weights() override;
+    Constraints& constraints(Id id) override;
+    std::size_t constraint_degrees() const noexcept override;
+    Weights weights() override;
     Variable make_variable() override;
 
     std::vector<std::uint32_t> make_pixels(const data::Tensor<Variable>& variables);

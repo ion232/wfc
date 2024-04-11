@@ -59,18 +59,18 @@ bool Wfc::propagate() {
     while (!m_propagation_stack.empty()) {
         const auto& current_index = m_propagation_stack.top();
         auto& current_variable = m_variables[current_index];
-        auto valid_ids = valid_adjacencies(current_variable.ids());
-        auto adjacent_indices = m_variables.adjacent(current_index);
+        auto possible_ids = constraining_ids(current_variable.ids());
+        auto surrounding_indices = m_variables.surrounding(current_index);
         m_propagation_stack.pop();
 
-        for (std::size_t i = 0; i < adjacent_indices.size(); i++) {
-            auto& index = adjacent_indices[i];
+        for (std::size_t i = 0; i < surrounding_indices.size(); i++) {
+            auto& index = surrounding_indices[i];
             if (!index) {
                 continue;
             }
             auto& variable = m_variables[*index];
 
-            if (auto changed = variable.constrain_to(valid_ids[i])) {
+            if (auto changed = variable.constrain_to(possible_ids[i])) {
                 if (variable.size() == 0) {
                     return true;
                 }
@@ -86,23 +86,23 @@ bool Wfc::propagate() {
     return false;
 }
 
-std::vector<IdSet> Wfc::valid_adjacencies(const IdSet& ids) {
-    auto adjacencies = std::vector<IdSet>(
-        m_config.model->adjacency_count(),
-        IdSet(ids.capacity() + 1)
+std::vector<IdSet> Wfc::constraining_ids(const IdSet& domain_ids) {
+    auto constraining_ids = std::vector<IdSet>(
+        m_config.model->constraint_degrees(),
+        IdSet(domain_ids.capacity() + 1)
     );
 
-    for (const auto& id : ids) {
-        const auto& valid_adjacent_ids = m_config.model->adjacencies(id);
-        for (std::size_t i = 0; i < valid_adjacent_ids.size(); i++) {
-            for (const auto& [valid_id, count] : valid_adjacent_ids[i]) {
+    for (const auto& id : domain_ids) {
+        const auto& constraints_for_id = m_config.model->constraints(id);
+        for (std::size_t i = 0; i < constraints_for_id.size(); i++) {
+            for (const auto& [id, count] : constraints_for_id[i]) {
                 std::ignore = count;
-                adjacencies[i].insert(valid_id);
+                constraining_ids[i].insert(id);
             }
         }
     }
 
-    return adjacencies;
+    return constraining_ids;
 }
 
 bool Wfc::resolved() {

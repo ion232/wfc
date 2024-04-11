@@ -15,7 +15,7 @@ std::uint32_t Pattern::value() const {
 
 // TODO: ion232: Make this generic instead of 2D only.
 // TODO: ion232: Remove the magic from this.
-std::vector<bool> Pattern::adjacencies(const Pattern& other) const {
+std::vector<bool> Pattern::overlaps(const Pattern& other) const {
     static constexpr auto count = std::size_t(8);
     static const auto areas = std::array<std::vector<std::size_t>, count>({{
         {0, 1, 3, 4, 6, 7}, // l
@@ -28,7 +28,7 @@ std::vector<bool> Pattern::adjacencies(const Pattern& other) const {
         {3, 4, 6, 7} // bl
     }});
 
-    auto adjacencies = std::vector<bool>(count, true);
+    auto overlaps = std::vector<bool>(count, true);
 
     for (std::size_t i = 0; i < count; i++) {
         const auto& area = areas[i];
@@ -36,13 +36,13 @@ std::vector<bool> Pattern::adjacencies(const Pattern& other) const {
 
         for (std::size_t j = 0; j < area.size(); j++) {
             if (m_tensor[area[j]] != other.m_tensor[other_area[j]]) {
-                adjacencies[i] = false;
+                overlaps[i] = false;
                 break;
             }
         }
     }
 
-    return adjacencies;
+    return overlaps;
 }
 
 bool Pattern::operator==(const Pattern& other) const {

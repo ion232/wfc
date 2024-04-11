@@ -10,23 +10,23 @@
 namespace wfc::model {
 
 Image::Image(
-    std::vector<Model::Adjacencies> adjacencies,
+    std::vector<Constraints> constraints,
     Model::Weights weights,
     IdMap<std::uint32_t> pixels,
     IdMap<std::size_t> support_counts
 )
-    : m_adjacencies(std::move(adjacencies))
+    : m_constraints(std::move(constraints))
     , m_weights(std::move(weights))
     , m_pixels(std::move(pixels))
     , m_support_counts(std::move(support_counts))
 {}
 
-Image::Adjacencies& Image::adjacencies(Id id) {
-    return m_adjacencies[id];
+Image::Constraints& Image::constraints(Id id) {
+    return m_constraints[id];
 }
 
-std::size_t Image::adjacency_count() const noexcept {
-    return m_adjacencies.begin()->size();
+std::size_t Image::constraint_degrees() const noexcept {
+    return m_constraints.begin()->size();
 }
 
 Image::Weights Image::weights() {
