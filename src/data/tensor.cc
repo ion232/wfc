@@ -9,27 +9,27 @@ namespace wfc::data {
 namespace {
     using Range = std::pair<std::int32_t, std::int32_t>;
 
-    std::vector<Degree> make_degrees(const std::vector<Range>& ranges, bool exclude_zero = true) {
+    std::vector<Offset> make_offsets(const std::vector<Range>& ranges, bool exclude_zero = true) {
         auto result = [&ranges](){
             const auto range = *ranges.cbegin();
-            auto degrees = std::vector<Degree>();
+            auto offsets = std::vector<Offset>();
 
             for (std::int32_t i = range.first; i <= range.second; i++) {
-                degrees.emplace_back(Degree({i}));
+                offsets.emplace_back(Offset({i}));
             }
 
-            return degrees;
+            return offsets;
         }();
 
         for (std::size_t i = 1; i < ranges.size(); i++) {
-            auto next = std::vector<Degree>();
+            auto next = std::vector<Offset>();
             auto range = ranges[i];
 
             for (std::int32_t c = range.first; c <= range.second; c++) {
-                for (const auto& degree : result) {
-                    auto extended_degree = degree;
-                    extended_degree.emplace_back(c);
-                    next.emplace_back(std::move(extended_degree));
+                for (const auto& offset : result) {
+                    auto extended_offset = offset;
+                    extended_offset.emplace_back(c);
+                    next.emplace_back(std::move(extended_offset));
                 }
             }
 
@@ -38,7 +38,7 @@ namespace {
         
         if (exclude_zero) {
             const auto is_zero = [&ranges](const auto& x){
-                static const auto all_zeroes = Degree(ranges.size(), 0);
+                static const auto all_zeroes = Offset(ranges.size(), 0);
                 return x == all_zeroes;
             };
             if (auto it = std::find_if(result.begin(), result.end(), is_zero); it != result.end()) {
@@ -53,14 +53,14 @@ namespace {
 template<typename T>
 Tensor<T>::Tensor(const std::vector<Dimension>& dimensions, std::vector<T>&& data)
     : m_dimensions(dimensions)
-    , m_degrees(make_degrees(std::vector<Range>(dimensions.size(), Range{-1, 1})))
+    , m_offsets(make_offsets(std::vector<Range>(dimensions.size(), Range{-1, 1})))
     , m_data(std::move(data))
 {}
 
 template<typename T>
 Tensor<T>::Tensor(const std::vector<Dimension>& dimensions, T value)
     : m_dimensions(dimensions)
-    , m_degrees(make_degrees(std::vector<Range>(dimensions.size(), Range{-1, 1})))
+    , m_offsets(make_offsets(std::vector<Range>(dimensions.size(), Range{-1, 1})))
     , m_data(std::reduce(m_dimensions.begin(), m_dimensions.end(), 1, std::multiplies<>()), value)
 {}
 
@@ -76,7 +76,7 @@ const T& Tensor<T>::operator[](Index index) const {
 
 template<typename T>
 Tensor<T> Tensor<T>::area_at(const std::vector<Dimension>& dimensions, Index least_index) const {
-    auto degrees = [&dimensions](){
+    auto offsets = [&dimensions](){
         auto ranges = std::vector<Range>();
 
         for (const auto& dimension : dimensions) {
@@ -84,18 +84,18 @@ Tensor<T> Tensor<T>::area_at(const std::vector<Dimension>& dimensions, Index lea
         }
         
         static constexpr auto exclude_zero = false;
-        return make_degrees(std::move(ranges), exclude_zero);
+        return make_offsets(std::move(ranges), exclude_zero);
     }();
 
     auto least_coordinate = index_to_coordinate(least_index);
     auto data = std::vector<T>();
-    data.reserve(degrees.size());
+    data.reserve(offsets.size());
 
-    for (const auto& degree : degrees) {
+    for (const auto& offset : offsets) {
         auto coordinate = least_coordinate;
 
-        for (std::size_t i = 0; i < degree.size(); i++) {
-            coordinate[i] += degree[i];
+        for (std::size_t i = 0; i < offset.size(); i++) {
+            coordinate[i] += offset[i];
         }
 
         if (out_of_bounds(coordinate)) {
@@ -112,7 +112,7 @@ Tensor<T> Tensor<T>::area_at(const std::vector<Dimension>& dimensions, Index lea
 }
 
 template<typename T>
-Tensor<T> Tensor<T>::translated(const Degree& degree) const {
+Tensor<T> Tensor<T>::translated(const Offset& offset) const {
     auto data = std::vector<T>();
     data.reserve(m_data.size());
 
@@ -120,7 +120,7 @@ Tensor<T> Tensor<T>::translated(const Degree& degree) const {
         auto coordinate = index_to_coordinate(index);
 
         for (std::size_t i = 0; i < coordinate.size(); i++) {
-            coordinate[i] -= degree[i];
+            coordinate[i] -= offset[i];
         }
 
         if (out_of_bounds(coordinate)) {
@@ -137,15 +137,15 @@ Tensor<T> Tensor<T>::translated(const Degree& degree) const {
 }
 
 template<typename T>
-std::vector<std::optional<Index>> Tensor<T>::indices_at_degrees_from(Index central_index) const {
+std::vector<std::optional<Index>> Tensor<T>::indices_at_offsets_from(Index central_index) const {
     auto values = std::vector<std::optional<Index>>();
     auto central_coordinate = index_to_coordinate(central_index);
 
-    for (const auto& degree : m_degrees) {
+    for (const auto& offset : m_offsets) {
         auto coordinate = central_coordinate;
 
-        for (std::size_t i = 0; i < degree.size(); i++) {
-            coordinate[i] += degree[i];
+        for (std::size_t i = 0; i < offset.size(); i++) {
+            coordinate[i] += offset[i];
         }
 
         if (out_of_bounds(coordinate)) {
@@ -166,8 +166,8 @@ const std::vector<Dimension>& Tensor<T>::dimensions() const {
 }
 
 template<typename T>
-const std::vector<Degree>& Tensor<T>::degrees() const {
-    return m_degrees;
+const std::vector<Offset>& Tensor<T>::offsets() const {
+    return m_offsets;
 }
 
 template<typename T>

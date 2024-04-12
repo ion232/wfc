@@ -13,8 +13,8 @@ std::vector<bool> Pattern::overlaps(const Pattern& other) const {
     const auto make_areas = [](const auto& tensor){
         auto result = std::vector<data::Tensor<image::Pixel>>();
 
-        for (const auto& degree : tensor.degrees()) {
-            auto area = tensor.translated(degree);
+        for (const auto& offset : tensor.offsets()) {
+            auto area = tensor.translated(offset);
             result.emplace_back(std::move(area));
         }
 
@@ -23,10 +23,10 @@ std::vector<bool> Pattern::overlaps(const Pattern& other) const {
 
     const auto areas = make_areas(m_tensor);
     const auto other_areas = make_areas(other.m_tensor);
-    const auto degree_count = m_tensor.degrees().size();
-    auto overlaps = std::vector<bool>(degree_count, true);
+    const auto offset_count = m_tensor.offsets().size();
+    auto overlaps = std::vector<bool>(offset_count, true);
 
-    for (std::size_t i = 0; i < degree_count; i++) {
+    for (std::size_t i = 0; i < offset_count; i++) {
         const auto& area = areas[i];
         const auto& other_area = other_areas[other_areas.size() - i - 1];
 

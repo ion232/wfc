@@ -29,7 +29,7 @@ public:
     );
 
     Constraints& constraints(Id id) override;
-    std::size_t constraint_degrees() const noexcept override;
+    std::size_t constraint_offsets() const noexcept override;
     Weights weights() override;
     Variable make_variable() override;
 

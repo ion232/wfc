@@ -25,7 +25,7 @@ Image::Constraints& Image::constraints(Id id) {
     return m_constraints[id];
 }
 
-std::size_t Image::constraint_degrees() const noexcept {
+std::size_t Image::constraint_offsets() const noexcept {
     return m_constraints.begin()->size();
 }
 

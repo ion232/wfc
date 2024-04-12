@@ -17,7 +17,7 @@ public:
 
     virtual Variable make_variable() = 0;
     virtual Constraints& constraints(Id id) = 0;
-    virtual std::size_t constraint_degrees() const noexcept = 0;
+    virtual std::size_t constraint_offsets() const noexcept = 0;
     virtual Weights weights() = 0;
 };
 

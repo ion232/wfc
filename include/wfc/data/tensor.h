@@ -10,7 +10,7 @@
 namespace wfc::data {
 
 using Dimension = std::size_t;
-using Degree = std::vector<std::int32_t>;
+using Offset = std::vector<std::int32_t>;
 using Coordinate = std::vector<std::int32_t>;
 using Index = std::size_t;
 
@@ -18,7 +18,7 @@ template<typename T>
 class Tensor {
 private:
     std::vector<Dimension> m_dimensions;
-    std::vector<Degree> m_degrees;
+    std::vector<Offset> m_offsets;
     std::vector<T> m_data;
 
 public:
@@ -30,11 +30,11 @@ public:
     const T& operator[](Index index) const;
 
     Tensor<T> area_at(const std::vector<Dimension>& dimensions, Index least_index) const;
-    Tensor<T> translated(const Degree& degree) const;
-    std::vector<std::optional<Index>> indices_at_degrees_from(Index central_index) const;
+    Tensor<T> translated(const Offset& offset) const;
+    std::vector<std::optional<Index>> indices_at_offsets_from(Index central_index) const;
 
     const std::vector<Dimension>& dimensions() const;
-    const std::vector<Degree>& degrees() const;
+    const std::vector<Offset>& offsets() const;
     std::size_t size() const;
 
     bool operator==(const Tensor<T>& other) const;

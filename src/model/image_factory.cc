@@ -71,13 +71,13 @@ std::shared_ptr<Image> ImageFactory::make_image(
     }();
 
     auto [constraints, supports] = [&image_tensor, &patterns](){
-        auto constraint_degrees = image_tensor.degrees().size();
+        auto constraint_offsets = image_tensor.offsets().size();
         auto constraints = std::vector<Image::Constraints>();
         auto supports = IdMap<std::size_t>();
 
         for (auto& [pattern, id] : patterns) {
             std::ignore = pattern;
-            constraints.emplace_back(constraint_degrees, IdMap<std::size_t>());
+            constraints.emplace_back(constraint_offsets, IdMap<std::size_t>());
             supports.insert({id, 1});
         }
 

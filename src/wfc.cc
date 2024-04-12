@@ -60,7 +60,7 @@ bool Wfc::propagate() {
         const auto& current_index = m_propagation_stack.top();
         auto& current_variable = m_variables[current_index];
         auto possible_ids = constraining_ids(current_variable.ids());
-        auto connected_indices = m_variables.indices_at_degrees_from(current_index);
+        auto connected_indices = m_variables.indices_at_offsets_from(current_index);
         m_propagation_stack.pop();
 
         for (std::size_t i = 0; i < connected_indices.size(); i++) {
@@ -88,7 +88,7 @@ bool Wfc::propagate() {
 
 std::vector<IdSet> Wfc::constraining_ids(const IdSet& domain_ids) {
     auto constraining_ids = std::vector<IdSet>(
-        m_config.model->constraint_degrees(),
+        m_config.model->constraint_offsets(),
         IdSet(domain_ids.capacity() + 1)
     );
 
