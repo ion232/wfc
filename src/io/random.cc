@@ -17,7 +17,7 @@ Random::Random()
 
 Random::Random(std::int32_t seed)
     : m_device()
-    , m_seed_seq({seed, seed, seed, seed, seed, seed, seed, seed})
+    , m_seed_seq({seed})
     , m_engine(m_seed_seq)
 {}
 
