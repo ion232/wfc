@@ -75,7 +75,7 @@ const T& Tensor<T>::operator[](Index index) const {
 }
 
 template<typename T>
-Tensor<T> Tensor<T>::area_at(const std::vector<Dimension>& dimensions, Index least_index) const {
+Tensor<T> Tensor<T>::area_at(const std::vector<Dimension>& dimensions, Index least_index, bool pad) const {
     auto offsets = [&dimensions](){
         auto ranges = std::vector<Range>();
 
@@ -98,7 +98,9 @@ Tensor<T> Tensor<T>::area_at(const std::vector<Dimension>& dimensions, Index lea
             coordinate[i] += offset[i];
         }
 
-        if (out_of_bounds(coordinate)) {
+        if (pad) {
+            coordinate = clamp(coordinate);
+        } else if (out_of_bounds(coordinate)) {
             continue;
         }
 
@@ -205,6 +207,20 @@ Index Tensor<T>::coordinate_to_index(const Coordinate& coordinate) const noexcep
     }
 
     return index;
+}
+
+template<typename T>
+Coordinate Tensor<T>::clamp(const Coordinate& coordinate) const noexcept {
+    static constexpr auto low = std::int32_t(0);
+    auto clamped_coordinate = Coordinate();
+
+    for (std::size_t i = 0; i < coordinate.size(); i++) {
+        const auto high = static_cast<std::int32_t>(m_dimensions[i]);
+        auto clamped_value = std::clamp(coordinate[i], low, high);
+        clamped_coordinate.emplace_back(std::move(clamped_value));
+    }
+
+    return clamped_coordinate;
 }
 
 template<typename T>

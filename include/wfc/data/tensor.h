@@ -29,7 +29,7 @@ public:
     T& operator[](Index index);
     const T& operator[](Index index) const;
 
-    Tensor<T> area_at(const std::vector<Dimension>& dimensions, Index least_index) const;
+    Tensor<T> area_at(const std::vector<Dimension>& dimensions, Index least_index, bool pad) const;
     Tensor<T> translated(const Offset& offset) const;
     std::vector<std::optional<Index>> indices_at_offsets_from(Index central_index) const;
 
@@ -44,6 +44,7 @@ public:
 private:
     Coordinate index_to_coordinate(Index index) const noexcept;
     Index coordinate_to_index(const Coordinate& coordinate) const noexcept;
+    Coordinate clamp(const Coordinate& coordinate) const noexcept;
     bool out_of_bounds(const Coordinate& coordinate) const noexcept;
 };
 

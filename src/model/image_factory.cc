@@ -30,30 +30,23 @@ std::shared_ptr<Image> ImageFactory::make_image(
     }();
 
     auto [max_id, patterns, weights] = [&pattern_dimensions, &image_tensor](){
-        const auto full_area_size = static_cast<std::size_t>(std::reduce(
-            pattern_dimensions.begin(),
-            pattern_dimensions.end(),
-            1,
-            std::multiplies<>()
-        ));
+        static constexpr auto pad = static_cast<bool>(true);
+
         auto id = std::size_t(0);
         auto weights_map = IdMap<std::size_t>();
         auto patterns_map = std::unordered_map<overlap::Pattern, Id>();
 
         for (std::size_t i = 0; i < image_tensor.size(); i++) {
-            auto area = image_tensor.area_at(pattern_dimensions, i);
+            auto area = image_tensor.area_at(pattern_dimensions, i, pad);
+            auto pattern = overlap::Pattern(std::move(area));
 
-            if (area.size() != full_area_size) {
+            if (patterns_map.contains(pattern)) {
                 continue;
             }
 
-            auto pattern = overlap::Pattern(std::move(area));
-
-            if (!patterns_map.contains(pattern)) {
-                patterns_map.insert({pattern, id});
-                weights_map.insert({id, 1});
-                id++;
-            }
+            patterns_map.insert({pattern, id});
+            weights_map.insert({id, 1});
+            id++;
         }
 
         auto tuple = std::make_tuple(id, patterns_map, weights_map);
