@@ -97,10 +97,10 @@ std::shared_ptr<Image> ImageFactory::make_image(
                 }
 
                 if (!constraints1[i].contains(id2)) {
-                    constraints1[i][id2] = 0;
+                    constraints1[i][id2] = 1;
+                } else {
+                    constraints1[i][id2] += 1;
                 }
-
-                constraints1[i][id2] += 1;
             }
         }
     }
