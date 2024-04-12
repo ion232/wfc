@@ -1,6 +1,7 @@
 #pragma once
 
 #include "wfc/data/tensor.h"
+#include "wfc/image/pixel.h"
 
 #include <cstdint>
 #include <vector>
@@ -9,14 +10,14 @@ namespace wfc::model::overlap {
 
 class Pattern {
 private:
-    data::Tensor<std::uint32_t> m_tensor;
-    std::uint32_t m_value;
+    data::Tensor<image::Pixel> m_tensor;
 
 public:
-    Pattern(data::Tensor<std::uint32_t>&& tensor, std::uint32_t value);
+    Pattern(data::Tensor<image::Pixel>&& tensor);
 
-    std::uint32_t value() const;
     std::vector<bool> overlaps(const Pattern& other) const;
+
+    image::Pixel value() const;
 
     bool operator==(const Pattern& other) const;
 

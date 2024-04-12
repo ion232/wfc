@@ -1,5 +1,6 @@
 #pragma once
 
+#include "wfc/data/tensor.h"
 #include "wfc/interface/image/loader.h"
 #include "wfc/model/image.h"
 
@@ -16,7 +17,10 @@ private:
 public:
     ImageFactory(std::shared_ptr<image::interface::Loader> image_loader);
 
-    std::shared_ptr<Image> make_image(const std::filesystem::path& path);
+    std::shared_ptr<Image> make_image(
+        const std::filesystem::path& path,
+        const std::vector<data::Dimension>& pattern_dimensions
+    );
 };
 
 } // namespace wfc::model

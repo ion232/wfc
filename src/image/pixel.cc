@@ -11,6 +11,10 @@ namespace {
     }
 }
 
+bool operator==(const Pixel& l, const Pixel& r) {
+    return (l.r == r.r) && (l.g == r.g) && (l.b == r.b) && (l.a == r.a);
+}
+
 Pixel make_pixel(Byte r, Byte g, Byte b, Byte a) {
     return Pixel{r, g, b, a};
 }

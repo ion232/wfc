@@ -7,95 +7,109 @@ ImageFactory::ImageFactory(std::shared_ptr<image::interface::Loader> image_loade
     : m_image_loader(std::move(image_loader))
 {}
 
-std::shared_ptr<Image> ImageFactory::make_image(const std::filesystem::path& path) {
-    auto pixels = m_image_loader->load_pixels(path);
+std::shared_ptr<Image> ImageFactory::make_image(
+    const std::filesystem::path& path,
+    const std::vector<data::Dimension>& pattern_dimensions
+)
+{
+    auto image_tensor = [this, &path](){
+        auto raw_pixels = m_image_loader->load_pixels(path);
+        auto dimensions = std::vector<data::Dimension>({
+            raw_pixels.begin()->size(),
+            raw_pixels.size()
+        });
+        auto data = std::vector<image::Pixel>();
+        data.reserve(raw_pixels.size() * raw_pixels.size());
 
-    // TODO: ion232: Rename everything to match where it ends up. E.g. weights_map -> weights.
-    // TODO: ion232: Sort out code relating to constraint count, etc.
-    constexpr auto make_block = [](const auto& pixels, const auto x, const auto y) -> std::vector<std::uint32_t> {
-        return {
-            argb(pixels[y - 1][x - 1]),
-            argb(pixels[y - 1][x]),
-            argb(pixels[y - 1][x + 1]),
-            argb(pixels[y][x - 1]),
-            argb(pixels[y][x]),
-            argb(pixels[y][x + 1]),
-            argb(pixels[y + 1][x - 1]),
-            argb(pixels[y + 1][x]),
-            argb(pixels[y + 1][x + 1]),
-        };
-    };
-
-    auto unique_patterns = std::unordered_set<overlap::Pattern>();
-    auto weights = std::unordered_map<overlap::Pattern, std::size_t>();
-
-    for (std::size_t y = 1; y < pixels.size() - 1; y++) {
-        for (std::size_t x = 1; x < pixels[y].size() - 1; x++) {
-            auto block = make_block(pixels, x, y);
-            // TODO: ion232: More magic to refactor.
-            auto tensor = data::Tensor<std::uint32_t>({3, 3}, std::move(block));
-            auto value = argb(pixels[y][x]);
-            auto pattern = overlap::Pattern(std::move(tensor), value);
-            if (!weights.contains(pattern)) {
-                weights.insert({pattern, 0});
-            }
-            weights[pattern] += 1;
-            unique_patterns.emplace(std::move(pattern));
+        for (auto& row : raw_pixels) {
+            std::move(row.begin(), row.end(), std::back_inserter(data));
         }
-    }
 
-    auto id = std::size_t(0);
-    auto pattern_map = IdMap<overlap::Pattern>();
-    auto pattern_to_id = std::unordered_map<overlap::Pattern, Id>();
-    for (auto& pattern : unique_patterns) {
-        pattern_to_id.insert({pattern, id});
-        pattern_map.insert({id, std::move(pattern)});
-        id++;
-    }
+        auto tensor = data::Tensor<image::Pixel>(dimensions, std::move(data));
+        return tensor;
+    }();
 
-    auto pixel_map = IdMap<std::uint32_t>();
-    for (const auto& [id, pattern] : pattern_map) {
-        pixel_map.insert({id, pattern.value()});
-    }
+    auto [max_id, patterns, weights] = [&pattern_dimensions, &image_tensor](){
+        const auto full_area_size = static_cast<std::size_t>(std::reduce(
+            pattern_dimensions.begin(),
+            pattern_dimensions.end(),
+            1,
+            std::multiplies<>()
+        ));
+        auto id = std::size_t(0);
+        auto weights_map = IdMap<std::size_t>();
+        auto patterns_map = std::unordered_map<overlap::Pattern, Id>();
 
-    auto weights_map = IdMap<std::size_t>();
-    for (const auto& [pattern, count] : weights) {
-        auto id = pattern_to_id[pattern];
-        weights_map.insert({id, count});
-    }
+        for (std::size_t i = 0; i < image_tensor.size(); i++) {
+            auto area = image_tensor.area_at(pattern_dimensions, i);
 
-    // TODO: ion232: Make this derived or otherwise configurable.
-    static constexpr auto constraint_degrees = std::size_t(8);
-    auto constraints_map = std::vector<Image::Constraints>();
-    auto support_map = IdMap<std::size_t>();
-    for (auto& [id, _] : pattern_map) {
-        constraints_map.emplace_back(constraint_degrees, IdMap<std::size_t>());
-        support_map.insert({id, 1});
-    }
+            if (area.size() != full_area_size) {
+                continue;
+            }
 
-    for (auto& [p1, id1] : pattern_to_id) {
-        auto& constraints1 = constraints_map[id1];
+            auto pattern = overlap::Pattern(std::move(area));
 
-        for (auto& [p2, id2] : pattern_to_id) { 
+            if (!patterns_map.contains(pattern)) {
+                patterns_map.insert({pattern, id});
+                weights_map.insert({id, 1});
+                id++;
+            }
+        }
+
+        auto tuple = std::make_tuple(id, patterns_map, weights_map);
+        return tuple;
+    }();
+
+    auto pixels = [&patterns](){
+        auto result = IdMap<image::Pixel>();
+
+        for (const auto& [pattern, id] : patterns) {
+            result.insert({id, pattern.value()});
+        }
+
+        return result;
+    }();
+
+    auto [constraints, supports] = [&image_tensor, &patterns](){
+        auto constraint_degrees = image_tensor.degrees().size();
+        auto constraints = std::vector<Image::Constraints>();
+        auto supports = IdMap<std::size_t>();
+
+        for (auto& [pattern, id] : patterns) {
+            std::ignore = pattern;
+            constraints.emplace_back(constraint_degrees, IdMap<std::size_t>());
+            supports.insert({id, 1});
+        }
+
+        auto tuple = std::make_tuple(constraints, supports);
+        return tuple;
+    }();
+
+    for (auto& [p1, id1] : patterns) {
+        auto& constraints1 = constraints[id1];
+
+        for (auto& [p2, id2] : patterns) { 
             auto overlaps = p1.overlaps(p2);
 
             for (std::size_t i = 0; i < overlaps.size(); i++) {
                 if (!overlaps[i]) {
                     continue;
                 }
+
                 if (!constraints1[i].contains(id2)) {
                     constraints1[i][id2] = 0;
                 }
+
                 constraints1[i][id2] += 1;
             }
         }
     }
 
     auto image = std::make_shared<Image>(
-        std::move(constraints_map),
-        std::move(weights_map),
-        std::move(pixel_map),
-        std::move(support_map)
+        std::move(constraints),
+        std::move(weights),
+        std::move(pixels),
+        std::move(supports)
     );
 
     return image;

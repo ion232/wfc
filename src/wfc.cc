@@ -60,11 +60,11 @@ bool Wfc::propagate() {
         const auto& current_index = m_propagation_stack.top();
         auto& current_variable = m_variables[current_index];
         auto possible_ids = constraining_ids(current_variable.ids());
-        auto surrounding_indices = m_variables.surrounding(current_index);
+        auto connected_indices = m_variables.indices_at_degrees_from(current_index);
         m_propagation_stack.pop();
 
-        for (std::size_t i = 0; i < surrounding_indices.size(); i++) {
-            auto& index = surrounding_indices[i];
+        for (std::size_t i = 0; i < connected_indices.size(); i++) {
+            auto& index = connected_indices[i];
             if (!index) {
                 continue;
             }

@@ -12,7 +12,7 @@
 namespace app {
 namespace {
     void log(const std::string& message) {
-        std::cout << "[app]" << message << std::endl;
+        std::cout << "[app] " << message << std::endl;
     }
 
     void log_sdl_error() {
@@ -110,7 +110,7 @@ int App::run() {
         for (std::size_t y = 0; y < width; y++) {
             for (std::size_t x = 0; x < height; x++) {
                 const auto index = x + (y * width);
-                screen_pixels[index] = pixels[index];
+                screen_pixels[index] = wfc::image::argb(pixels[index]);
             }
         }
 
@@ -132,8 +132,9 @@ App make(
 {
     auto image = [&image_path](){
         auto png_loader = std::make_shared<app::PngLoader>();
-        auto image_factory =  wfc::model::ImageFactory(png_loader);
-        return image_factory.make_image(image_path);
+        auto image_factory = wfc::model::ImageFactory(png_loader);
+        auto pattern_dimensions = std::vector<wfc::data::Dimension>({3, 3});
+        return image_factory.make_image(image_path, pattern_dimensions);
     }();
 
     auto config = [&image](){
@@ -144,12 +145,15 @@ App make(
         return wfc::Wfc::Config{sample, entropy, image, random};
     }();
 
-    auto dimensions = std::vector<std::size_t>({width, height});
-    auto variable = image->make_variable();
-    auto tensor = wfc::data::Tensor<wfc::Variable>(
-        std::move(dimensions),
-        std::move(variable)
-    );
+    auto tensor = [&width, &height, &image](){
+        auto dimensions = std::vector<std::size_t>({width, height});
+        auto variable = image->make_variable();
+        auto result = wfc::data::Tensor<wfc::Variable>(
+            std::move(dimensions),
+            std::move(variable)
+        );
+        return result;
+    }();
 
     auto wfc = wfc::Wfc(std::move(config), std::move(tensor));
     auto app = app::App(std::move(wfc), image);
