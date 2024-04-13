@@ -26,6 +26,11 @@ std::size_t Random::make_size_t(std::size_t min, std::size_t max) {
     return distribution(m_engine);
 }
 
+std::size_t Random::sample_index(const std::vector<std::size_t>& weights) {
+    auto distribution = std::discrete_distribution<std::size_t>(weights.begin(), weights.end());
+    return distribution(m_engine);
+}
+
 float Random::make_float(float min, float max) {
     auto distribution = std::uniform_real_distribution<float>(min, max);
     return distribution(m_engine);

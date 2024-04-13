@@ -38,14 +38,18 @@ data::Tensor<Variable>& Wfc::variables() {
 
 bool Wfc::constrain() {
     auto index = m_config.choice_heuristic->choose();
+
     if (!index) {
         return true;
     }
+
     auto& variable = m_variables[*index];
     auto id = m_config.assignment_heuristic->assign_from(variable.ids());
+
     if (!id) {
         return true;
     }
+
     variable.assign(*id);
 
     m_variables_assigned++;

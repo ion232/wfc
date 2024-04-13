@@ -215,12 +215,24 @@ Coordinate Tensor<T>::clamp(const Coordinate& coordinate) const noexcept {
     auto clamped_coordinate = Coordinate();
 
     for (std::size_t i = 0; i < coordinate.size(); i++) {
-        const auto high = static_cast<std::int32_t>(m_dimensions[i]);
+        const auto high = static_cast<std::int32_t>(m_dimensions[i] - 1);
         auto clamped_value = std::clamp(coordinate[i], low, high);
         clamped_coordinate.emplace_back(std::move(clamped_value));
     }
 
     return clamped_coordinate;
+}
+
+template<typename T>
+Coordinate Tensor<T>::wrap(const Coordinate& coordinate) const noexcept {
+    auto wrapped_coordinate = Coordinate();
+
+    for (std::size_t i = 0; i < coordinate.size(); i++) {
+        auto wrapped_value = coordinate[i] % m_dimensions[i];
+        wrapped_coordinate.emplace_back(std::move(wrapped_value));
+    }
+
+    return wrapped_coordinate;
 }
 
 template<typename T>

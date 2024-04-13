@@ -30,7 +30,7 @@ std::shared_ptr<Image> ImageFactory::make_image(
     }();
 
     auto [max_id, patterns, weights] = [&pattern_dimensions, &image_tensor](){
-        static constexpr auto pad = static_cast<bool>(true);
+        static constexpr auto pad = static_cast<bool>(false);
 
         auto id = std::size_t(0);
         auto weights_map = IdMap<std::size_t>();
@@ -40,12 +40,14 @@ std::shared_ptr<Image> ImageFactory::make_image(
             auto area = image_tensor.area_at(pattern_dimensions, i, pad);
             auto pattern = overlap::Pattern(std::move(area));
 
-            if (patterns_map.contains(pattern)) {
+            if (!patterns_map.contains(pattern)) {
+                patterns_map.insert({pattern, id});
+                weights_map.insert({id, 1});
+            } else {
+                weights_map[patterns_map[pattern]]++;
                 continue;
             }
 
-            patterns_map.insert({pattern, id});
-            weights_map.insert({id, 1});
             id++;
         }
 

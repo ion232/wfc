@@ -37,7 +37,7 @@ std::vector<bool> Pattern::overlaps(const Pattern& other) const {
 }
 
 image::Pixel Pattern::value() const {
-    return m_tensor[m_tensor.size() - 1];
+    return m_tensor[0];
 }
 
 bool Pattern::operator==(const Pattern& other) const {

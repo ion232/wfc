@@ -45,6 +45,7 @@ private:
     Coordinate index_to_coordinate(Index index) const noexcept;
     Index coordinate_to_index(const Coordinate& coordinate) const noexcept;
     Coordinate clamp(const Coordinate& coordinate) const noexcept;
+    Coordinate wrap(const Coordinate& coordinate) const noexcept;
     bool out_of_bounds(const Coordinate& coordinate) const noexcept;
 };
 
