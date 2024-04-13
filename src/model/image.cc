@@ -12,12 +12,12 @@ namespace wfc::model {
 Image::Image(
     std::vector<Constraints> constraints,
     Model::Weights weights,
-    IdMap<image::Pixel> pixels,
+    IdMap<overlap::Pattern> patterns,
     IdMap<std::size_t> support_counts
 )
     : m_constraints(std::move(constraints))
     , m_weights(std::move(weights))
-    , m_pixels(std::move(pixels))
+    , m_patterns(std::move(patterns))
     , m_support_counts(std::move(support_counts))
 {}
 
@@ -46,7 +46,7 @@ std::vector<image::Pixel> Image::make_pixels(const data::Tensor<Variable>& varia
 
         if (state == Variable::State::Decided) {
             const auto id = *ids.begin();
-            const auto pixel = m_pixels[id];
+            const auto pixel = m_patterns.at(id).value();
             return pixel;
         } else if (state == Variable::State::Undecided) {
             static constexpr auto max_byte = std::numeric_limits<image::Byte>::max();
@@ -59,7 +59,7 @@ std::vector<image::Pixel> Image::make_pixels(const data::Tensor<Variable>& varia
             auto a = static_cast<image::Byte>((variable.size() * max_byte) / domain_size);
 
             for (const auto& id : ids) {
-                const auto pixel = m_pixels[id];
+                const auto pixel = m_patterns.at(id).value();
                 r += pixel.r;
                 g += pixel.g;
                 b += pixel.b;

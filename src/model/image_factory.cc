@@ -34,17 +34,19 @@ std::shared_ptr<Image> ImageFactory::make_image(
 
         auto id = std::size_t(0);
         auto weights_map = IdMap<std::size_t>();
-        auto patterns_map = std::unordered_map<overlap::Pattern, Id>();
+        auto pattern_to_id = std::unordered_map<overlap::Pattern, Id>();
+        auto patterns_map = IdMap<overlap::Pattern>();
 
         for (std::size_t i = 0; i < image_tensor.size(); i++) {
             auto area = image_tensor.area_at(pattern_dimensions, i, pad);
             auto pattern = overlap::Pattern(std::move(area));
 
-            if (!patterns_map.contains(pattern)) {
-                patterns_map.insert({pattern, id});
+            if (!pattern_to_id.contains(pattern)) {
+                patterns_map.insert({id, pattern});
                 weights_map.insert({id, 1});
+                pattern_to_id.insert({pattern, id});
             } else {
-                weights_map[patterns_map[pattern]]++;
+                weights_map[pattern_to_id[pattern]]++;
                 continue;
             }
 
@@ -55,22 +57,12 @@ std::shared_ptr<Image> ImageFactory::make_image(
         return tuple;
     }();
 
-    auto pixels = [&patterns](){
-        auto result = IdMap<image::Pixel>();
-
-        for (const auto& [pattern, id] : patterns) {
-            result.insert({id, pattern.value()});
-        }
-
-        return result;
-    }();
-
     auto [constraints, supports] = [&image_tensor, &patterns](){
         auto constraint_offsets = image_tensor.offsets().size();
         auto constraints = std::vector<Image::Constraints>();
         auto supports = IdMap<std::size_t>();
 
-        for (auto& [pattern, id] : patterns) {
+        for (auto& [id, pattern] : patterns) {
             std::ignore = pattern;
             constraints.emplace_back(constraint_offsets, IdMap<std::size_t>());
             supports.insert({id, 1});
@@ -80,10 +72,10 @@ std::shared_ptr<Image> ImageFactory::make_image(
         return tuple;
     }();
 
-    for (auto& [p1, id1] : patterns) {
+    for (auto& [id1, p1] : patterns) {
         auto& constraints1 = constraints[id1];
 
-        for (auto& [p2, id2] : patterns) { 
+        for (auto& [id2, p2] : patterns) { 
             auto overlaps = p1.overlaps(p2);
 
             for (std::size_t i = 0; i < overlaps.size(); i++) {
@@ -103,7 +95,7 @@ std::shared_ptr<Image> ImageFactory::make_image(
     auto image = std::make_shared<Image>(
         std::move(constraints),
         std::move(weights),
-        std::move(pixels),
+        std::move(patterns),
         std::move(supports)
     );
 

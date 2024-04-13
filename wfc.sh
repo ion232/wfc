@@ -28,7 +28,7 @@ run() {
     if [ "$cmake_generator" == "Ninja" ]; then
         $app "$cwd/assets/images/flowers.png" 64 64
     elif [ "$cmake_generator" == "Unix Makefiles" ]; then
-        $app "$cwd/assets/images/flowers.png" 128 128
+        $app "$cwd/assets/images/flowers.png" 64 64
     elif [ "$cmake_generator" == "Xcode" ]; then
         open "$build_dir/$project_name.xcodeproj"
     else

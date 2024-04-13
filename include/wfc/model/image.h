@@ -2,8 +2,9 @@
 
 #include "wfc/variable.h"
 #include "wfc/data/tensor.h"
-#include "wfc/interface/image/loader.h"
 #include "wfc/interface/model.h"
+#include "wfc/interface/image/loader.h"
+#include "wfc/model/overlap/pattern.h"
 
 #include <cstdint>
 #include <filesystem>
@@ -16,7 +17,7 @@ class Image: public interface::Model {
 private:
     std::vector<Constraints> m_constraints;
     Model::Weights m_weights;
-    IdMap<image::Pixel> m_pixels;
+    IdMap<overlap::Pattern> m_patterns;
     IdMap<std::size_t> m_support_counts;
 
 public:
@@ -24,7 +25,7 @@ public:
     Image(
         std::vector<Constraints> constraints,
         Model::Weights weights,
-        IdMap<image::Pixel> pixels,
+        IdMap<overlap::Pattern> patterns,
         IdMap<std::size_t> support_counts
     );
 
