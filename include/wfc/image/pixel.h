@@ -13,6 +13,8 @@ struct Pixel {
     Byte a;
 };
 
+bool operator==(const Pixel& l, const Pixel& r);
+
 Pixel make_pixel(Byte r, Byte g, Byte b, Byte a);
 Pixel make_pixel(std::uint32_t pixel);
 

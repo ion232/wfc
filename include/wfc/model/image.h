@@ -16,7 +16,7 @@ class Image: public interface::Model {
 private:
     std::vector<Constraints> m_constraints;
     Model::Weights m_weights;
-    IdMap<std::uint32_t> m_pixels;
+    IdMap<image::Pixel> m_pixels;
     IdMap<std::size_t> m_support_counts;
 
 public:
@@ -24,16 +24,16 @@ public:
     Image(
         std::vector<Constraints> constraints,
         Model::Weights weights,
-        IdMap<std::uint32_t> pixels,
+        IdMap<image::Pixel> pixels,
         IdMap<std::size_t> support_counts
     );
 
     Constraints& constraints(Id id) override;
-    std::size_t constraint_degrees() const noexcept override;
+    std::size_t constraint_offsets() const noexcept override;
     Weights weights() override;
     Variable make_variable() override;
 
-    std::vector<std::uint32_t> make_pixels(const data::Tensor<Variable>& variables);
+    std::vector<image::Pixel> make_pixels(const data::Tensor<Variable>& variables);
 };
 
 } // namespace wfc::model

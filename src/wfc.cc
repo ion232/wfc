@@ -38,14 +38,18 @@ data::Tensor<Variable>& Wfc::variables() {
 
 bool Wfc::constrain() {
     auto index = m_config.choice_heuristic->choose();
+
     if (!index) {
         return true;
     }
+
     auto& variable = m_variables[*index];
     auto id = m_config.assignment_heuristic->assign_from(variable.ids());
+
     if (!id) {
         return true;
     }
+
     variable.assign(*id);
 
     m_variables_assigned++;
@@ -60,23 +64,28 @@ bool Wfc::propagate() {
         const auto& current_index = m_propagation_stack.top();
         auto& current_variable = m_variables[current_index];
         auto possible_ids = constraining_ids(current_variable.ids());
-        auto surrounding_indices = m_variables.surrounding(current_index);
+        auto offset_indices = m_variables.indices_at_offsets_from(current_index);
+
         m_propagation_stack.pop();
 
-        for (std::size_t i = 0; i < surrounding_indices.size(); i++) {
-            auto& index = surrounding_indices[i];
+        for (std::size_t i = 0; i < offset_indices.size(); i++) {
+            auto& index = offset_indices[i];
+
             if (!index) {
                 continue;
             }
+
             auto& variable = m_variables[*index];
 
             if (auto changed = variable.constrain_to(possible_ids[i])) {
-                if (variable.size() == 0) {
+                const auto state = variable.state();
+
+                if (state == Variable::State::Invalid) {
                     return true;
-                }
-                if (variable.size() == 1) {
+                } else if (state == Variable::State::Decided) {
                     m_variables_assigned++;
                 }
+
                 m_config.choice_heuristic->inform(*index, variable);
                 m_propagation_stack.push(std::move(*index));
             }
@@ -88,12 +97,13 @@ bool Wfc::propagate() {
 
 std::vector<IdSet> Wfc::constraining_ids(const IdSet& domain_ids) {
     auto constraining_ids = std::vector<IdSet>(
-        m_config.model->constraint_degrees(),
+        m_config.model->constraint_offsets(),
         IdSet(domain_ids.capacity() + 1)
     );
 
     for (const auto& id : domain_ids) {
         const auto& constraints_for_id = m_config.model->constraints(id);
+
         for (std::size_t i = 0; i < constraints_for_id.size(); i++) {
             for (const auto& [id, count] : constraints_for_id[i]) {
                 std::ignore = count;
