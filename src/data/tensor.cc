@@ -75,6 +75,16 @@ const T& Tensor<T>::operator[](Index index) const {
 }
 
 template<typename T>
+T& Tensor<T>::operator[](Coordinate coordinate) {
+    return m_data[coordinate_to_index(coordinate)];
+}
+
+template<typename T>
+const T& Tensor<T>::operator[](Coordinate coordinate) const {
+    return m_data[coordinate_to_index(coordinate)];
+}
+
+template<typename T>
 Tensor<T> Tensor<T>::area_at(const std::vector<Dimension>& dimensions, Index least_index, bool pad) const {
     auto offsets = [&dimensions](){
         auto ranges = std::vector<Range>();

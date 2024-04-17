@@ -2,6 +2,7 @@
 #include "png_loader.h"
 
 #include "wfc/model/image_factory.h"
+#include "wfc/model/preconstrainer.h"
 #include "wfc/heuristic/assignment/sample.h"
 #include "wfc/heuristic/choice/entropy.h"
 
@@ -134,7 +135,8 @@ App make(
         auto png_loader = std::make_shared<app::PngLoader>();
         auto image_factory = wfc::model::ImageFactory(png_loader);
         auto pattern_dimensions = std::vector<wfc::data::Dimension>({3, 3});
-        return image_factory.make_image(image_path, pattern_dimensions);
+        auto result = image_factory.make_image(image_path, pattern_dimensions);
+        return result;
     }();
 
     auto config = [&image](){
@@ -142,21 +144,42 @@ App make(
         auto weights = std::make_shared<wfc::heuristic::Weights>(image->weights());
         auto sample = std::make_shared<wfc::heuristic::assignment::Sample>(weights, random);
         auto entropy = std::make_shared<wfc::heuristic::choice::Entropy>(weights, random);
-        return wfc::Wfc::Config{sample, entropy, image, random};
-    }();
-
-    auto tensor = [&width, &height, &image](){
-        auto dimensions = std::vector<std::size_t>({width, height});
-        auto variable = image->make_variable();
-        auto result = wfc::data::Tensor<wfc::Variable>(
-            std::move(dimensions),
-            std::move(variable)
-        );
+        auto result = wfc::Wfc::Config{sample, entropy, image, random};
         return result;
     }();
 
-    auto wfc = wfc::Wfc(std::move(config), std::move(tensor));
-    auto app = app::App(std::move(wfc), image);
+    auto preconstraints = [&width, &height, &image_path](){
+        static constexpr const auto has_dirt = [](const auto& pattern){
+            static const auto dirt = wfc::image::make_pixel(185, 122, 87, 255);
+            return pattern.contains(dirt);
+        };
+
+        auto result = wfc::model::Preconstrainer();
+        if (image_path.filename() != "flowers.png") {
+            return result;
+        }
+
+        for (std::int32_t x = 0; x < static_cast<std::int32_t>(width); x++) {
+            for (std::int32_t y = 0; y < 2; y++) {
+                const auto coordinate = wfc::data::Coordinate{x, static_cast<std::int32_t>(height) - y - 1};
+                result.add(coordinate, has_dirt);
+            }
+        }
+
+        return result;
+    }();
+    auto tensor = [&width, &height, &image, &preconstraints](){
+        auto dimensions = std::vector<std::size_t>({width, height});
+        auto variables = image->make_variables(dimensions);
+        preconstraints.preconstrain(image->patterns(), variables);
+        return variables;
+    }();
+
+    auto app = [&config, &tensor, &image](){
+        auto wfc = wfc::Wfc(std::move(config), std::move(tensor));
+        auto result = app::App(std::move(wfc), image);
+        return result;
+    }();
 
     return app;
 }

@@ -10,12 +10,12 @@ namespace wfc::model::interface {
 
 class Model {
 public:
-    using Constraints = std::vector<IdMap<std::size_t>>;
+    using Constraints = std::vector<IdSet>;
     using Weights = IdMap<std::size_t>;
 
     virtual ~Model() {};
 
-    virtual Variable make_variable() = 0;
+    virtual data::Tensor<Variable> make_variables(const std::vector<data::Dimension>& dimensions) = 0;
     virtual Constraints& constraints(Id id) = 0;
     virtual std::size_t constraint_offsets() const noexcept = 0;
     virtual Weights weights() = 0;

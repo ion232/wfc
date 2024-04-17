@@ -54,6 +54,7 @@ std::optional<std::size_t> Entropy::choose() {
         if (entropy < min_entropy) {
             min_entropy = entropy;
             variable_indices.clear();
+            variable_indices.emplace_back(it->first);
         }
         if (entropy == min_entropy) {
             variable_indices.emplace_back(it->first);

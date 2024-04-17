@@ -1,4 +1,4 @@
-#include "wfc/model/image_factory.h"
+ #include "wfc/model/image_factory.h"
 #include "wfc/model/overlap/pattern.h"
 
 namespace wfc::model {
@@ -57,19 +57,16 @@ std::shared_ptr<Image> ImageFactory::make_image(
         return tuple;
     }();
 
-    auto [constraints, supports] = [&image_tensor, &patterns](){
+    auto constraints = [&image_tensor, &patterns](){
         auto constraint_offsets = image_tensor.offsets().size();
         auto constraints = std::vector<Image::Constraints>();
-        auto supports = IdMap<std::size_t>();
 
         for (auto& [id, pattern] : patterns) {
             std::ignore = pattern;
-            constraints.emplace_back(constraint_offsets, IdMap<std::size_t>());
-            supports.insert({id, 1});
+            constraints.emplace_back(constraint_offsets, IdSet(patterns.size() - 1));
         }
 
-        auto tuple = std::make_tuple(constraints, supports);
-        return tuple;
+        return constraints;
     }();
 
     for (auto& [id1, p1] : patterns) {
@@ -83,11 +80,7 @@ std::shared_ptr<Image> ImageFactory::make_image(
                     continue;
                 }
 
-                if (!constraints1[i].contains(id2)) {
-                    constraints1[i][id2] = 1;
-                } else {
-                    constraints1[i][id2] += 1;
-                }
+                constraints1[i].insert(id2);
             }
         }
     }
@@ -95,8 +88,7 @@ std::shared_ptr<Image> ImageFactory::make_image(
     auto image = std::make_shared<Image>(
         std::move(constraints),
         std::move(weights),
-        std::move(patterns),
-        std::move(supports)
+        std::move(patterns)
     );
 
     return image;

@@ -6,59 +6,45 @@
 namespace wfc {
 
 Variable::Variable()
-    : m_map()
+    : m_ids()
 {}
 
-Variable::Variable(IdMap<std::size_t>&& map)
-    : m_map(std::move(map))
+Variable::Variable(IdSet&& supports)
+    : m_ids(std::move(supports))
 {}
 
 void Variable::assign(Id id) {
-    m_map = IdMap<std::size_t>({{id, m_map[id]}});
+    m_ids = IdSet({id});
+}
+
+void Variable::remove(Id id) {
+    m_ids.remove(id);
 }
 
 bool Variable::constrain_to(const IdSet& allowed) {
-    auto to_remove = std::vector<Id>();
+    const auto size_before = m_ids.size();
+    m_ids.intersect_with(allowed);
 
-    for (auto& [id, count] : m_map) {
-        if (allowed.contains(id)) {
-            continue;
-        }
-
-        count--;
-
-        if (count == 0) {
-            to_remove.emplace_back(id);
-        }
-    }
-
-    auto changed = to_remove.size() > 0;
-
-    for (const auto& id : to_remove) {
-        m_map.erase(id);
-    }
-
-    return changed;
+    const auto size_after = m_ids.size();
+    return size_before != size_after;
 }
 
 IdSet Variable::ids() const noexcept {
-    auto ids = IdSet(m_map.size());
+    auto ids = IdSet(m_ids.size());
 
-    for (const auto& [id, count] : m_map) {
-        if (count != 0) {
-            ids.insert(id);
-        }
+    for (const auto& id : m_ids) {
+        ids.insert(id);
     }
 
     return ids;
 }
 
 Variable::State Variable::state() const noexcept {
-    const auto count = size();
+    const auto domain_size = size();
 
-    if (count == 0) {
+    if (domain_size == 0) {
         return State::Invalid;
-    } else if (count == 1) {
+    } else if (domain_size == 1) {
         return State::Decided;
     } else {
         return State::Undecided;
@@ -66,11 +52,11 @@ Variable::State Variable::state() const noexcept {
 }
 
 std::size_t Variable::size() const noexcept {
-    return m_map.size();
+    return m_ids.size();
 }
 
 bool Variable::operator==(const Variable& other) const {
-    return m_map == other.m_map;
+    return m_ids == other.m_ids;
 }
 
 } // namespace wfc

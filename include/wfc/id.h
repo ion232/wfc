@@ -45,16 +45,20 @@ private:
 
 public:
     IdSet();
+    IdSet(std::initializer_list<Id> il);
     IdSet(Id max_id);
 
     void insert(const Id& id);
     void remove(const Id& id);
+    void intersect_with(const IdSet& id_set);
+    void union_with(const IdSet& id_set);
     void clear();
-
     bool contains(const Id& id) const;
 
     std::size_t capacity() const;
     std::size_t size() const;
+
+    bool operator==(const IdSet& other) const noexcept;
 
     IdSet::iterator begin() const;
     IdSet::iterator end() const;

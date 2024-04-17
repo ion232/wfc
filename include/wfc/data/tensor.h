@@ -10,8 +10,9 @@
 namespace wfc::data {
 
 using Dimension = std::size_t;
-using Offset = std::vector<std::int32_t>;
-using Coordinate = std::vector<std::int32_t>;
+using Tuple = std::vector<std::int32_t>;
+using Coordinate = Tuple;
+using Offset = Tuple;
 using Index = std::size_t;
 
 template<typename T>
@@ -28,6 +29,8 @@ public:
 
     T& operator[](Index index);
     const T& operator[](Index index) const;
+    T& operator[](Coordinate coordinate);
+    const T& operator[](Coordinate coordinate) const;
 
     Tensor<T> area_at(const std::vector<Dimension>& dimensions, Index least_index, bool pad) const;
     Tensor<T> translated(const Offset& offset) const;

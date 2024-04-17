@@ -12,13 +12,11 @@ namespace wfc::model {
 Image::Image(
     std::vector<Constraints> constraints,
     Model::Weights weights,
-    IdMap<overlap::Pattern> patterns,
-    IdMap<std::size_t> support_counts
+    IdMap<overlap::Pattern> patterns
 )
     : m_constraints(std::move(constraints))
     , m_weights(std::move(weights))
     , m_patterns(std::move(patterns))
-    , m_support_counts(std::move(support_counts))
 {}
 
 Image::Constraints& Image::constraints(Id id) {
@@ -33,13 +31,23 @@ Image::Weights Image::weights() {
     return m_weights;
 }
 
-Variable Image::make_variable() {
-    auto supports = m_support_counts;
-    auto variable = Variable(std::move(supports));
-    return variable;
+const Image::Patterns& Image::patterns() const noexcept {
+    return m_patterns;
 }
 
-std::vector<image::Pixel> Image::make_pixels(const data::Tensor<Variable>& variables) {
+data::Tensor<Variable> Image::make_variables(const std::vector<data::Dimension>& dimensions) {
+    auto id_set = IdSet();
+    for (Id id = 0; id < m_patterns.size() - 1; id++) {
+        id_set.insert(id);
+    }
+    auto variable = Variable(std::move(id_set));
+    auto tensor = data::Tensor<Variable>(dimensions, std::move(variable));
+
+    return tensor;
+}
+
+std::vector<image::Pixel> Image::make_pixels(
+    const data::Tensor<Variable>& variables) {
     static const auto make_pixel = [this](const auto& variable){
         const auto state = variable.state();
         const auto ids = variable.ids();
