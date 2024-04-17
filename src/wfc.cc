@@ -51,7 +51,6 @@ bool Wfc::constrain() {
     }
 
     variable.assign(*id);
-
     m_variables_assigned++;
     m_config.choice_heuristic->inform(*index, variable);
     m_propagation_stack.push(std::move(*index));
@@ -105,10 +104,7 @@ std::vector<IdSet> Wfc::constraining_ids(const IdSet& domain_ids) {
         const auto& constraints_for_id = m_config.model->constraints(id);
 
         for (std::size_t i = 0; i < constraints_for_id.size(); i++) {
-            for (const auto& [id, count] : constraints_for_id[i]) {
-                std::ignore = count;
-                constraining_ids[i].insert(id);
-            }
+            constraining_ids[i].union_with(constraints_for_id[i]);
         }
     }
 

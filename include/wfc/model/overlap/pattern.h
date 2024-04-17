@@ -16,6 +16,7 @@ public:
     Pattern(data::Tensor<image::Pixel>&& tensor);
 
     std::vector<bool> overlaps(const Pattern& other) const;
+    bool contains(const image::Pixel& pixel) const;
 
     image::Pixel value() const;
 

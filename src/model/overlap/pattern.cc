@@ -36,6 +36,16 @@ std::vector<bool> Pattern::overlaps(const Pattern& other) const {
     return overlaps;
 }
 
+bool Pattern::contains(const image::Pixel& pixel) const {
+    for (std::size_t i = 0; i < m_tensor.size(); i++) {
+        if (m_tensor[i] == pixel) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 image::Pixel Pattern::value() const {
     return m_tensor[0];
 }

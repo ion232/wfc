@@ -48,8 +48,17 @@ IdSet::IdSet()
     , m_size(0)
 {}
 
+IdSet::IdSet(std::initializer_list<Id> il)
+    : m_data(il.size(), false)
+    , m_size(0)
+{
+    for (const auto& id : il) {
+        insert(id);
+    }
+}
+
 IdSet::IdSet(Id max_id)
-    : m_data(max_id + 1, false)
+    : m_data(max_id, false)
     , m_size(0)
 {}
 
@@ -69,6 +78,20 @@ void IdSet::remove(const Id& id) {
     m_data[id] = false;
 }
 
+void IdSet::intersect_with(const IdSet& id_set) {
+    for (std::size_t id = 0; id < m_data.size(); id++) {
+        if (!id_set.contains(id)) {
+            remove(id);
+        }
+    }
+}
+
+void IdSet::union_with(const IdSet& id_set) {
+    for (const auto& id : id_set) {
+        insert(id);
+    }
+}
+
 bool IdSet::contains(const Id& id) const {
     return (id < m_data.size()) && m_data[id];
 }
@@ -86,6 +109,10 @@ std::size_t IdSet::capacity() const {
 
 std::size_t IdSet::size() const {
     return m_size;
+}
+
+bool IdSet::operator==(const IdSet& other) const noexcept {
+    return m_data == other.m_data;
 }
 
 IdSet::iterator IdSet::begin() const {

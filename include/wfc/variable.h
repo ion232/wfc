@@ -19,13 +19,14 @@ public:
     };
 
 private:
-    IdMap<std::size_t> m_map;
+    IdSet m_ids;
 
 public:
     Variable();
-    Variable(IdMap<std::size_t>&& map);
+    Variable(IdSet&& ids);
 
     void assign(Id id);
+    void remove(Id id);
     bool constrain_to(const IdSet& allowed);
 
     IdSet ids() const noexcept;
