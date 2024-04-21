@@ -14,11 +14,12 @@ Variable::Variable(IdSet&& supports)
 {}
 
 void Variable::assign(Id id) {
-    m_ids = IdSet({id});
+    m_ids.clear();
+    m_ids.set(id);
 }
 
 void Variable::remove(Id id) {
-    m_ids.remove(id);
+    m_ids.unset(id);
 }
 
 bool Variable::constrain_to(const IdSet& allowed) {
@@ -30,13 +31,7 @@ bool Variable::constrain_to(const IdSet& allowed) {
 }
 
 IdSet Variable::ids() const noexcept {
-    auto ids = IdSet(m_ids.size());
-
-    for (const auto& id : m_ids) {
-        ids.insert(id);
-    }
-
-    return ids;
+    return m_ids;
 }
 
 Variable::State Variable::state() const noexcept {

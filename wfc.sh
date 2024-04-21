@@ -4,7 +4,11 @@ set -e
 
 readonly build_dir="build"
 readonly app_name="wfc_app"
+readonly unit_tests_name="wfc_unit_tests"
 readonly project_name="wfc"
+readonly app_bin="./$build_dir/$app_name"
+readonly test_bin="./$build_dir/$unit_tests_name"
+readonly cwd="$(pwd)"
 
 cmake_build_type="Release"
 cmake_generator="Ninja"
@@ -22,18 +26,19 @@ build() {
 }
 
 run() {
-    readonly app="./$build_dir/$app_name"
-    readonly cwd="$(pwd)"
-
     if [ "$cmake_generator" == "Ninja" ]; then
-        $app "$cwd/assets/images/flowers.png" 64 64
+        $app_bin "$cwd/assets/images/flowers.png" 64 64
     elif [ "$cmake_generator" == "Unix Makefiles" ]; then
-        $app "$cwd/assets/images/flowers.png" 64 64
+        $app_bin "$cwd/assets/images/flowers.png" 64 64
     elif [ "$cmake_generator" == "Xcode" ]; then
         open "$build_dir/$project_name.xcodeproj"
     else
         echo "Unsupported generator: $cmake_generator"
     fi
+}
+
+test() {
+    $test_bin
 }
 
 clean() {
@@ -58,6 +63,8 @@ main() {
         build
     elif [ "$1" == "run" ]; then
         build && run
+    elif [ "$1" == "test" ]; then
+        build && test
     elif [ "$1" == "clean" ]; then
         clean
     else

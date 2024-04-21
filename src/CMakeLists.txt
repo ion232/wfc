@@ -6,6 +6,5 @@ add_subdirectory(model)
 
 target_sources(wfc PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/variable.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/id.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/wfc.cc
 )

@@ -63,7 +63,7 @@ std::shared_ptr<Image> ImageFactory::make_image(
 
         for (auto& [id, pattern] : patterns) {
             std::ignore = pattern;
-            constraints.emplace_back(constraint_offsets, IdSet(patterns.size() - 1));
+            constraints.emplace_back(constraint_offsets, IdSet(patterns.size(), false));
         }
 
         return constraints;
@@ -80,7 +80,7 @@ std::shared_ptr<Image> ImageFactory::make_image(
                     continue;
                 }
 
-                constraints1[i].insert(id2);
+                constraints1[i].set(id2);
             }
         }
     }
