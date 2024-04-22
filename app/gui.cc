@@ -15,13 +15,11 @@ namespace {
     }
 
     SDL_Window* make_window(std::size_t width, std::size_t height) {
-        static constexpr auto no_window_flags = SDL_WindowFlags(0);
-
         auto* window = SDL_CreateWindow(
             "ion232/wfc_app",
             static_cast<int>(width),
             static_cast<int>(height),
-            no_window_flags
+            SDL_WINDOW_ALWAYS_ON_TOP
         );
         if (window == nullptr) {
             log_sdl_error();
@@ -36,6 +34,11 @@ namespace {
 
         const auto pixel_color = SDL_MapRGB(screen_surface->format, 0xAA, 0xAA, 0xAA);
         if (SDL_FillSurfaceRect(screen_surface, nullptr, pixel_color) != 0) {
+            log_sdl_error();
+            return nullptr;
+        }
+
+        if (SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED) != 0) {
             log_sdl_error();
             return nullptr;
         }
@@ -109,6 +112,7 @@ int Gui::run() {
             }
         }
 
+        SDL_Delay(1);
         SDL_UnlockSurface(surface);
         SDL_UpdateWindowSurface(window);
     }

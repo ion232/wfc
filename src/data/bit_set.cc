@@ -90,7 +90,6 @@ BitSet::BitSet()
     , m_size(0)
 {}
 
-__attribute__((no_sanitize("integer")))
 BitSet::BitSet(std::size_t count, bool value)
     : m_bits()
     , m_size(count * static_cast<std::size_t>(value))

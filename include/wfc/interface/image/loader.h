@@ -3,6 +3,7 @@
 #include "wfc/image/pixel.h"
 
 #include <filesystem>
+#include <vector>
 
 namespace wfc::image::interface {
 
