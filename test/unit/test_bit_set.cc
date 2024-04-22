@@ -239,7 +239,7 @@ TEST_CASE("Union", "[bit_set]")  {
 }
 
 TEST_CASE("For each loop", "[bit_set]")  {
-    static constexpr auto count = std::size_t(1000);
+    static constexpr auto count = std::size_t(1001);
 
     auto bit_set = BitSet(count, false);
 
@@ -251,7 +251,7 @@ TEST_CASE("For each loop", "[bit_set]")  {
         }
     }
 
-    CHECK(bit_set.size() == (count / 2));
+    CHECK(bit_set.size() == (count / 2) + 1);
 
     for (const auto index : bit_set) {
         CHECK(bit_set.test(index));

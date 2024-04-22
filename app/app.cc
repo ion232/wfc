@@ -149,15 +149,16 @@ App make(
     }();
 
     auto preconstraints = [&width, &height, &image_path](){
+        auto result = wfc::model::Preconstrainer();
+
+        if (image_path.filename() != "flowers.png") {
+            return result;
+        }
+
         static constexpr const auto has_dirt = [](const auto& pattern){
             static const auto dirt = wfc::image::make_pixel(185, 122, 87, 255);
             return pattern.contains(dirt);
         };
-
-        auto result = wfc::model::Preconstrainer();
-        if (image_path.filename() != "flowers.png") {
-            return result;
-        }
 
         for (std::int32_t x = 0; x < static_cast<std::int32_t>(width); x++) {
             for (std::int32_t y = 0; y < 2; y++) {
@@ -168,6 +169,7 @@ App make(
 
         return result;
     }();
+
     auto tensor = [&width, &height, &image, &preconstraints](){
         auto dimensions = std::vector<std::size_t>({width, height});
         auto variables = image->make_variables(dimensions);
