@@ -1,3 +1,5 @@
+#include "wfc/id_map.h"
+#include "wfc/id_set.h"
 #include "wfc/model/image_factory.h"
 #include "wfc/model/overlap/pattern.h"
 
