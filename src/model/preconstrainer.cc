@@ -1,5 +1,7 @@
 #include "wfc/model/preconstrainer.h"
 
+#include <iostream>
+
 namespace wfc::model {
 
 void Preconstrainer::add(data::Coordinate coordinate, const Predicate& predicate) {

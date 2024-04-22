@@ -1,5 +1,9 @@
- #include "wfc/model/image_factory.h"
+#include "wfc/id_map.h"
+#include "wfc/id_set.h"
+#include "wfc/model/image_factory.h"
 #include "wfc/model/overlap/pattern.h"
+
+#include <iostream>
 
 namespace wfc::model {
 
@@ -31,7 +35,8 @@ std::shared_ptr<Image> ImageFactory::make_image(
 
     auto [max_id, patterns, weights] = [&pattern_dimensions, &image_tensor](){
         static constexpr auto pad = static_cast<bool>(false);
-
+        
+        const auto full_pattern_size = static_cast<std::size_t>(std::reduce(pattern_dimensions.begin(), pattern_dimensions.end(), 1, std::multiplies<>()));
         auto id = std::size_t(0);
         auto weights_map = IdMap<std::size_t>();
         auto pattern_to_id = std::unordered_map<overlap::Pattern, Id>();
@@ -39,6 +44,9 @@ std::shared_ptr<Image> ImageFactory::make_image(
 
         for (std::size_t i = 0; i < image_tensor.size(); i++) {
             auto area = image_tensor.area_at(pattern_dimensions, i, pad);
+            if (!pad && area.size() < full_pattern_size) {
+                continue;
+            }
             auto pattern = overlap::Pattern(std::move(area));
 
             if (!pattern_to_id.contains(pattern)) {
@@ -63,7 +71,7 @@ std::shared_ptr<Image> ImageFactory::make_image(
 
         for (auto& [id, pattern] : patterns) {
             std::ignore = pattern;
-            constraints.emplace_back(constraint_offsets, IdSet(patterns.size() - 1));
+            constraints.emplace_back(constraint_offsets, IdSet(patterns.size(), false));
         }
 
         return constraints;
@@ -72,15 +80,13 @@ std::shared_ptr<Image> ImageFactory::make_image(
     for (auto& [id1, p1] : patterns) {
         auto& constraints1 = constraints[id1];
 
-        for (auto& [id2, p2] : patterns) { 
+        for (auto& [id2, p2] : patterns) {
             auto overlaps = p1.overlaps(p2);
 
             for (std::size_t i = 0; i < overlaps.size(); i++) {
-                if (!overlaps[i]) {
-                    continue;
+                if (overlaps[i]) {
+                    constraints1[i].set(id2);
                 }
-
-                constraints1[i].insert(id2);
             }
         }
     }

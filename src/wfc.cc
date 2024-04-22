@@ -97,7 +97,7 @@ bool Wfc::propagate() {
 std::vector<IdSet> Wfc::constraining_ids(const IdSet& domain_ids) {
     auto constraining_ids = std::vector<IdSet>(
         m_config.model->constraint_offsets(),
-        IdSet(domain_ids.capacity() + 1)
+        IdSet(domain_ids.capacity(), false)
     );
 
     for (const auto& id : domain_ids) {

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "wfc/variable.h"
-#include "wfc/id.h"
 
 namespace wfc::heuristic::interface {
 

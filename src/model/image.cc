@@ -36,10 +36,7 @@ const Image::Patterns& Image::patterns() const noexcept {
 }
 
 data::Tensor<Variable> Image::make_variables(const std::vector<data::Dimension>& dimensions) {
-    auto id_set = IdSet();
-    for (Id id = 0; id < m_patterns.size() - 1; id++) {
-        id_set.insert(id);
-    }
+    auto id_set = IdSet(m_patterns.size(), true);
     auto variable = Variable(std::move(id_set));
     auto tensor = data::Tensor<Variable>(dimensions, std::move(variable));
 

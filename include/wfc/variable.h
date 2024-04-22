@@ -1,6 +1,7 @@
 #pragma once
 
 #include "wfc/id.h"
+#include "wfc/id_set.h"
 #include "wfc/io/random.h"
 
 #include <functional>

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "wfc/variable.h"
 #include "wfc/id.h"
+#include "wfc/id_set.h"
+#include "wfc/variable.h"
 
 #include <optional>
 #include <unordered_set>
