@@ -27,9 +27,21 @@ build() {
 
 run() {
     if [ "$cmake_generator" == "Ninja" ]; then
-        $app_bin "$cwd/assets/images/village.png" 64 64
+        $app_bin "gui" "$cwd/assets/images/village.png" 64 64
     elif [ "$cmake_generator" == "Unix Makefiles" ]; then
-        $app_bin "$cwd/assets/images/village.png" 64 64
+        $app_bin "gui" "$cwd/assets/images/village.png" 64 64
+    elif [ "$cmake_generator" == "Xcode" ]; then
+        open "$build_dir/$project_name.xcodeproj"
+    else
+        echo "Unsupported generator: $cmake_generator"
+    fi
+}
+
+benchmark() {
+    if [ "$cmake_generator" == "Ninja" ]; then
+        $app_bin "benchmark" "$cwd/assets/images/village.png"
+    elif [ "$cmake_generator" == "Unix Makefiles" ]; then
+        $app_bin "benchmark" "$cwd/assets/images/village.png"
     elif [ "$cmake_generator" == "Xcode" ]; then
         open "$build_dir/$project_name.xcodeproj"
     else
@@ -63,6 +75,8 @@ main() {
         build
     elif [ "$1" == "run" ]; then
         build && run
+    elif [ "$1" == "benchmark" ]; then
+        build && benchmark
     elif [ "$1" == "test" ]; then
         build && test
     elif [ "$1" == "clean" ]; then
