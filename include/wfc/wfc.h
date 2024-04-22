@@ -15,6 +15,14 @@ namespace wfc {
 
 class Wfc {
 public:
+    enum class Result {
+        Ok,
+        Resolved,
+        InvalidChoice,
+        InvalidAssignment,
+        Contradiction
+    };
+
     struct Config {
         std::shared_ptr<heuristic::interface::Assignment> assignment_heuristic;
         std::shared_ptr<heuristic::interface::Choice> choice_heuristic;
@@ -33,11 +41,11 @@ public:
 
     data::Tensor<Variable>& variables();
 
-    bool step();
+    Result step();
 
 private:
-    bool constrain();
-    bool propagate();
+    Result constrain();
+    Result propagate();
 
     std::vector<IdSet> constraining_ids(const IdSet& ids);
     bool resolved();

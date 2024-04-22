@@ -1,10 +1,4 @@
-#include "app.h"
-#include "png_loader.h"
-
-#include "wfc/model/image_factory.h"
-#include "wfc/model/preconstrainer.h"
-#include "wfc/heuristic/assignment/sample.h"
-#include "wfc/heuristic/choice/entropy.h"
+#include "gui.h"
 
 #include <iostream>
 
@@ -55,12 +49,12 @@ namespace {
     }
 }
 
-App::App(wfc::Wfc&& wfc, std::shared_ptr<wfc::model::Image> image_model)
+Gui::Gui(wfc::Wfc&& wfc, std::shared_ptr<wfc::model::Image> image_model)
     : m_wfc(std::move(wfc))
     , m_image_model(std::move(image_model))
 {}
 
-int App::run() {
+int Gui::run() {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         log_sdl_error();
         return EXIT_FAILURE;
@@ -91,14 +85,14 @@ int App::run() {
     const auto& variables = m_wfc.variables();
     auto pixels = m_image_model->make_pixels(variables);
     auto sdl_event = SDL_Event();
-    auto running = true;
+    auto running = wfc::Wfc::Result::Ok;
 
-    while (running) {
-        running = !m_wfc.step();
+    while (running == wfc::Wfc::Result::Ok) {
+        running = m_wfc.step();
 
         while (SDL_PollEvent(&sdl_event)) {
             if  (sdl_event.type == SDL_EVENT_QUIT) {
-                running = false;
+                running = wfc::Wfc::Result::Resolved;
             }
         }
 
@@ -125,65 +119,11 @@ int App::run() {
     return EXIT_SUCCESS;
 }
 
-App make(
-    const std::filesystem::path& image_path,
-    std::size_t width,
-    std::size_t height
-)
-{
-    auto image = [&image_path](){
-        auto png_loader = std::make_shared<app::PngLoader>();
-        auto image_factory = wfc::model::ImageFactory(png_loader);
-        auto pattern_dimensions = std::vector<wfc::data::Dimension>({3, 3});
-        auto result = image_factory.make_image(image_path, pattern_dimensions);
-        return result;
-    }();
+Gui make_gui(Components&& components) {
+    auto& [wfc, image] = components;
+    auto gui = Gui(std::move(wfc), image);
 
-    auto config = [&image](){
-        auto random = std::make_shared<wfc::io::Random>();
-        auto weights = std::make_shared<wfc::heuristic::Weights>(image->weights());
-        auto sample = std::make_shared<wfc::heuristic::assignment::Sample>(weights, random);
-        auto entropy = std::make_shared<wfc::heuristic::choice::Entropy>(weights, random);
-        auto result = wfc::Wfc::Config{sample, entropy, image, random};
-        return result;
-    }();
-
-    auto preconstraints = [&width, &height, &image_path](){
-        auto result = wfc::model::Preconstrainer();
-
-        if (image_path.filename() != "flowers.png") {
-            return result;
-        }
-
-        static constexpr const auto has_dirt = [](const auto& pattern){
-            static const auto dirt = wfc::image::make_pixel(185, 122, 87, 255);
-            return pattern.contains(dirt);
-        };
-
-        for (std::int32_t x = 0; x < static_cast<std::int32_t>(width); x++) {
-            for (std::int32_t y = 0; y < 2; y++) {
-                const auto coordinate = wfc::data::Coordinate{x, static_cast<std::int32_t>(height) - y - 1};
-                result.add(coordinate, has_dirt);
-            }
-        }
-
-        return result;
-    }();
-
-    auto tensor = [&width, &height, &image, &preconstraints](){
-        auto dimensions = std::vector<std::size_t>({width, height});
-        auto variables = image->make_variables(dimensions);
-        preconstraints.preconstrain(image->patterns(), variables);
-        return variables;
-    }();
-
-    auto app = [&config, &tensor, &image](){
-        auto wfc = wfc::Wfc(std::move(config), std::move(tensor));
-        auto result = app::App(std::move(wfc), image);
-        return result;
-    }();
-
-    return app;
+    return gui;
 }
 
 } // namespace app

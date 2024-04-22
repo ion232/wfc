@@ -16,38 +16,38 @@ Wfc::Wfc(Config&& config, data::Tensor<Variable>&& variables)
     }
 }
 
-bool Wfc::step() {
+Wfc::Result Wfc::step() {
     if (resolved()) {
-        return true;
+        return Result::Resolved;
+    }
+    
+    if (auto result = constrain(); result != Result::Ok) {
+        return result;
     }
 
-    if (constrain()) {
-        return true;
+    if (auto result = propagate(); result != Result::Ok) {
+        return result;
     }
 
-    if (propagate()) {
-        return true;
-    }
-
-    return false;
+    return Result::Ok;
 }
 
 data::Tensor<Variable>& Wfc::variables() {
     return m_variables;
 }
 
-bool Wfc::constrain() {
+Wfc::Result Wfc::constrain() {
     auto index = m_config.choice_heuristic->choose();
 
     if (!index) {
-        return true;
+        return Result::InvalidChoice;
     }
 
     auto& variable = m_variables[*index];
     auto id = m_config.assignment_heuristic->assign_from(variable.ids());
 
     if (!id) {
-        return true;
+        return Result::InvalidAssignment;
     }
 
     variable.assign(*id);
@@ -55,10 +55,10 @@ bool Wfc::constrain() {
     m_config.choice_heuristic->inform(*index, variable);
     m_propagation_stack.push(std::move(*index));
 
-    return false;
+    return Result::Ok;
 }
 
-bool Wfc::propagate() {
+Wfc::Result Wfc::propagate() {
     while (!m_propagation_stack.empty()) {
         const auto& current_index = m_propagation_stack.top();
         auto& current_variable = m_variables[current_index];
@@ -80,7 +80,7 @@ bool Wfc::propagate() {
                 const auto state = variable.state();
 
                 if (state == Variable::State::Invalid) {
-                    return true;
+                    return Result::Contradiction;
                 } else if (state == Variable::State::Decided) {
                     m_variables_assigned++;
                 }
@@ -91,7 +91,7 @@ bool Wfc::propagate() {
         }
     }
 
-    return false;
+    return Result::Ok;
 }
 
 std::vector<IdSet> Wfc::constraining_ids(const IdSet& domain_ids) {
