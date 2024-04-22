@@ -32,12 +32,17 @@ std::shared_ptr<Image> ImageFactory::make_image(
         auto tensor = data::Tensor<image::Pixel>(dimensions, std::move(data));
         return tensor;
     }();
+    
+    // ion232: Clang 14 (Ubuntu 22.04) does not support structured binding references, even though it's part of c++20.
+    auto max_id = static_cast<std::size_t>(0);
+    auto patterns = IdMap<overlap::Pattern>();
+    auto weights = IdMap<std::size_t>();
 
-    auto [max_id, patterns, weights] = [&pattern_dimensions, &image_tensor](){
+    std::tie(max_id, patterns, weights) = [&pattern_dimensions, &image_tensor](){
         static constexpr auto pad = static_cast<bool>(false);
         
         const auto full_pattern_size = static_cast<std::size_t>(std::reduce(pattern_dimensions.begin(), pattern_dimensions.end(), 1, std::multiplies<>()));
-        auto id = std::size_t(0);
+        auto id = static_cast<std::size_t>(0);
         auto weights_map = IdMap<std::size_t>();
         auto pattern_to_id = std::unordered_map<overlap::Pattern, Id>();
         auto patterns_map = IdMap<overlap::Pattern>();

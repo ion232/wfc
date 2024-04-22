@@ -2,6 +2,8 @@
 
 #include "wfc/variable.h"
 
+#include <optional>
+
 namespace wfc::heuristic::interface {
 
 class Choice {

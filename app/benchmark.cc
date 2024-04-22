@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <string>
 #include <tuple>
 
 namespace app {
@@ -19,7 +20,7 @@ void Benchmark::run(const std::vector<Parameters>& parameters_list) {
         std::cout << "Height: " << parameters.height << " ";
 
         if (auto elapsed = solve_time(parameters)) {
-            std::cout << "Elapsed: " << *elapsed;
+            std::cout << "Elapsed: " << std::to_string(elapsed->count());
         } else {
             // ion232: This could be replaced with more granular data.
             std::cout << "Failed.";

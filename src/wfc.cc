@@ -76,7 +76,7 @@ Wfc::Result Wfc::propagate() {
 
             auto& variable = m_variables[*index];
 
-            if (auto changed = variable.constrain_to(possible_ids[i])) {
+            if (auto changed = variable.constrain_to(possible_ids[i]); changed) {
                 const auto state = variable.state();
 
                 if (state == Variable::State::Invalid) {
