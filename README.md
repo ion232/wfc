@@ -1,3 +1,5 @@
+# Wfc
+
 This is yet another wfc ([wave function collapse](https://github.com/mxgmn/WaveFunctionCollapse)) library. I used [this great paper on the algorithm](https://escholarship.org/uc/item/3rm1w0mn) to understand its workings and write my implementation. This library is specifically designed for my own use case, but I've open sourced it in case it's useful to anyone - especially for learning, as most implementations are pretty unintelligible. There are no dependencies for the library itself except the C++20 standard library.
 
 <p align="center"><img alt="demo" src="./.github/assets/wfc.gif"></p>
