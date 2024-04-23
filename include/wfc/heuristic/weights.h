@@ -18,7 +18,7 @@ public:
     Weights() = delete;
     Weights(IdMap<std::size_t>&& weights);
 
-    std::vector<std::size_t> of(const IdSet& ids);
+    std::vector<std::size_t> of(const Variable::Domain& domain);
 };
 
 } // namespace wfc::heuristic 

@@ -11,9 +11,9 @@ void Preconstrainer::add(data::Coordinate coordinate, const Predicate& predicate
 void Preconstrainer::preconstrain(const Image::Patterns& patterns, data::Tensor<Variable>& variables) {
     for (const auto& [coordinate, preconstraint] : m_preconstraints) {
         auto& variable = variables[coordinate];
-        const auto variable_ids = variable.ids();
+        const auto domain = variable.domain();
 
-        for (const auto& id : variable_ids) {
+        for (const auto& id : domain) {
             if (!preconstraint(patterns.at(id))) {
                 variable.remove(id);
             } 

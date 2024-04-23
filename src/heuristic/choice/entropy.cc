@@ -39,7 +39,7 @@ void Entropy::inform(std::size_t index, const wfc::Variable& variable) {
     }
     
     if (variable.state() == wfc::Variable::State::Undecided) {
-        auto weights = m_weights->of(variable.ids());
+        auto weights = m_weights->of(variable.domain());
         auto entropy = calculate_entropy(std::move(weights));
         m_undecided[index] = entropy;
     }
