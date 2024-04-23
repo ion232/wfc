@@ -31,7 +31,8 @@ int main(int argc, const char* argv[]) {
                 {32, 32},
                 {64, 64},
                 {128, 128},
-                {256, 256}
+                {256, 256},
+                {512, 512}
             });
             return EXIT_SUCCESS;
         } else {

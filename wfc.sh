@@ -13,6 +13,28 @@ readonly cwd="$(pwd)"
 cmake_build_type="Release"
 cmake_generator="Ninja"
 
+dependencies() {
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        # ion232: For SDL3.
+        sudo apt-get update
+        sudo apt-get install build-essential git make \
+        pkg-config cmake ninja-build gnome-desktop-testing libasound2-dev libpulse-dev \
+        libaudio-dev libjack-dev libsndio-dev libx11-dev libxext-dev \
+        libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxss-dev \
+        libxkbcommon-dev libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev \
+        libegl1-mesa-dev libdbus-1-dev libibus-1.0-dev libudev-dev fcitx-libs-dev \
+        libpipewire-0.3-dev libwayland-dev libdecor-0-dev
+        sudo apt-get install g++ clang
+        echo "[wfc] You will need to switch to clang for Debug ASAN builds."
+        echo "[wfc] You may stick with g++ if only building for Release. (e.g. ./wfc.sh run)"
+        sudo update-alternatives --config cc
+        sudo update-alternatives --config c++
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        echo "[wfc] Please ensure you have Xcode 15+ installed."
+        brew install make ninja cmake
+    fi
+}
+
 build() {
     if [ "$cmake_build_type" == "Debug" ]; then
         export ASAN_OPTIONS=halt_on_error=1:symbolize=1:print_stacktrace=1:check_initialization_order=1
@@ -71,7 +93,9 @@ main() {
         cmake_build_type="$3"
     fi
 
-    if [ "$1" == "build" ]; then
+    if [ "$1" == "dependencies" ]; then
+        dependencies
+    elif [ "$1" == "build" ]; then
         build
     elif [ "$1" == "run" ]; then
         build && run
