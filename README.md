@@ -31,11 +31,11 @@ Once you have the required dependencies, use `wfc.sh` to run commands.
 - `./wfc benchmark` for `village.png` on my standard m1 macbook gives the following rough numbers. As you can see, the time taken is roughly proportional to the size of the image, until (presumably) the program runs out of good cache to use and has to resort to slower cache or main memory. Multithreading, exploiting symmetry, more bitset improvements, etc, are not implemented but would all improve performance.
 ```
 Image: "/Users/ion/Repos/wfc/assets/images/village.png"
-8x8 t=1ms
+8x8 t=2ms
 16x16 t=10ms
-32x32 t=50ms
-64x64 t=210ms
-128x128 t=915ms
-256x256 t=4989ms
-512x512 t=33845ms
+32x32 t=49ms
+64x64 t=219ms
+128x128 t=910ms
+256x256 t=4858ms
+512x512 t=29134ms
 ```
