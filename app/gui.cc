@@ -1,8 +1,7 @@
 #include "gui.h"
 
 #include <iostream>
-
-#include <SDL3/SDL.h>
+#include <optional>
 
 namespace app {
 namespace {
@@ -52,20 +51,15 @@ namespace {
     }
 }
 
-Gui::Gui(wfc::Wfc&& wfc, std::shared_ptr<wfc::model::Image> image_model)
-    : m_wfc(std::move(wfc))
-    , m_image_model(std::move(image_model))
+Gui::Gui(WfcFactory&& wfc_factory)
+    : m_wfc_factory(std::move(wfc_factory))
 {}
 
-int Gui::run() {
+int Gui::run(std::size_t width, std::size_t height) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         log_sdl_error();
         return EXIT_FAILURE;
     }
-
-    const auto dimensions = m_wfc.variables().dimensions();
-    const auto width = dimensions[0];
-    const auto height = dimensions[1];
 
     auto* window = make_window(width, height);
     if (window == nullptr) {
@@ -73,29 +67,52 @@ int Gui::run() {
         return EXIT_FAILURE;
     }
 
+    for (;;) {
+        if (!solve(window)) {
+            break;
+        }
+    }
+
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+
+    return EXIT_SUCCESS;
+}
+
+bool Gui::solve(SDL_Window* window) {
     auto* surface = SDL_GetWindowSurface(window);
+
     if (surface == nullptr) {
         log("Window surface is null.");
-        return EXIT_FAILURE;
+        return false;
     }
 
     auto* screen_pixels = static_cast<uint32_t*>(surface->pixels);
+
     if (screen_pixels == nullptr) {
         log("Screen pixels are null.");
-        return EXIT_FAILURE;
+        return false;
     }
 
-    const auto& variables = m_wfc.variables();
-    auto pixels = m_image_model->make_pixels(variables);
+    auto width = int(0);
+    auto height = int(0);
+
+    if (SDL_GetWindowSizeInPixels(window, &width, &height) != 0) {
+        return false;
+    }
+
+    auto wfc = m_wfc_factory.make_wfc(width, height);
+    auto image_model = m_wfc_factory.image_model();
+    auto pixels = image_model->make_pixels(wfc.variables());
     auto sdl_event = SDL_Event();
     auto running = wfc::Wfc::Result::Ok;
 
     while (running == wfc::Wfc::Result::Ok) {
-        running = m_wfc.step();
+        running = wfc.step();
 
         while (SDL_PollEvent(&sdl_event)) {
             if  (sdl_event.type == SDL_EVENT_QUIT) {
-                running = wfc::Wfc::Result::Resolved;
+                return false;
             }
         }
 
@@ -103,11 +120,11 @@ int Gui::run() {
             continue;
         }
 
-        pixels = m_image_model->make_pixels(variables);
+        pixels = image_model->make_pixels(wfc.variables());
 
-        for (std::size_t y = 0; y < width; y++) {
-            for (std::size_t x = 0; x < height; x++) {
-                const auto index = x + (y * width);
+        for (int y = 0; y < width; y++) {
+            for (int x = 0; x < height; x++) {
+                const auto index = static_cast<std::size_t>(x + (y * width));
                 screen_pixels[index] = wfc::image::argb(pixels[index]);
             }
         }
@@ -117,17 +134,7 @@ int Gui::run() {
         SDL_UpdateWindowSurface(window);
     }
 
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-
-    return EXIT_SUCCESS;
-}
-
-Gui make_gui(Components&& components) {
-    auto& [wfc, image] = components;
-    auto gui = Gui(std::move(wfc), image);
-
-    return gui;
+    return true;
 }
 
 } // namespace app

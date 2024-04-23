@@ -1,6 +1,7 @@
 #pragma once
 
-#include "components.h"
+#include "wfc_factory.h"
+
 #include "wfc/wfc.h"
 
 #include <chrono>
@@ -13,7 +14,7 @@ namespace app {
 
 class Benchmark {
 private:
-    std::filesystem::path m_image_path;
+    WfcFactory m_wfc_factory;
 
 public:
     struct Parameters {
@@ -21,7 +22,7 @@ public:
         std::size_t height;
     };
 
-    Benchmark(const std::filesystem::path& image_path);
+    Benchmark(WfcFactory&& wfc_factory);
 
     void run(const std::vector<Parameters>& parameters_list);
 

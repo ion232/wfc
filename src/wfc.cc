@@ -20,7 +20,7 @@ Wfc::Result Wfc::step() {
     if (resolved()) {
         return Result::Resolved;
     }
-    
+
     if (auto result = constrain(); result != Result::Ok) {
         return result;
     }
