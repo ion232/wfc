@@ -1,6 +1,6 @@
 This is yet another wfc ([wave function collapse](https://github.com/mxgmn/WaveFunctionCollapse)) library. I used [this great paper on the algorithm](https://escholarship.org/uc/item/3rm1w0mn) to understand its workings and write my implementation. This library is specifically designed for my own use case, but I've open sourced it in case it's useful to anyone - especially for learning, as most implementations are pretty unintelligible. There are no dependencies for the library itself except the C++20 standard library.
 
-![Wfc gif](./.github/assets/wfc.gif)
+<p align="center"><img alt="demo" src="./.github/assets/wfc.gif"></p>
 
 ## Build setup
 
@@ -26,7 +26,7 @@ Once you have the required dependencies, use `wfc.sh` to run commands.
 
 - I've made various optimisations guided by Instruments on macOS, such as the custom bitset class for variables, which constitutes most of the computation footprint. It's fast enough for my use case, but there's definitely room for further improvement. Some performance has been sacrificed for generality and comprehensibility.
 
-`./wfc benchmark` for `village.png` on my standard m1 macbook gives the following rough numbers. As you can see, the time taken is roughly proportional to the size of the image, until (presumably) the program runs out of good cache to use and has to resort to slower cache or main memory. Multithreading, exploiting symmetry, more bitset improvements, etc, are not implemented but would all improve performance.
+- `./wfc benchmark` for `village.png` on my standard m1 macbook gives the following rough numbers. As you can see, the time taken is roughly proportional to the size of the image, until (presumably) the program runs out of good cache to use and has to resort to slower cache or main memory. Multithreading, exploiting symmetry, more bitset improvements, etc, are not implemented but would all improve performance.
 ```
 Image: "/Users/ion/Repos/wfc/assets/images/village.png"
 8x8 t=1ms
