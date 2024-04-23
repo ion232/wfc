@@ -10,6 +10,7 @@ macro(wfc_set_defaults target)
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS OFF
     )
+    target_include_directories(${target} PRIVATE src)
 endmacro()
 
 macro(wfc_set_sanitiser_options target)
