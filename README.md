@@ -10,7 +10,7 @@ This codebase has only been tested on Linux and macOS, I've yet to test it on Wi
 **For macOS, you must have Xcode 15+ installed for C++20 support.**
 
 ```bash
-git clone --recurse-submodules git://github.com/ion232/wfc.git
+git clone --recurse-submodules --shallow-submodules --depth=1 git@github.com:ion232/wfc.git
 ./wfc.sh dependencies
 ```
 
