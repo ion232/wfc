@@ -13,6 +13,8 @@ namespace wfc {
 
 class Variable {
 public:
+    using Domain = IdSet;
+
     enum class State {
         Invalid,
         Undecided,
@@ -20,17 +22,17 @@ public:
     };
 
 private:
-    IdSet m_ids;
+    Domain m_domain;
 
 public:
     Variable();
-    Variable(IdSet&& ids);
+    Variable(Domain&& domain);
 
     void assign(Id id);
     void remove(Id id);
-    bool constrain_to(const IdSet& allowed);
+    bool constrain_to(const Domain& allowed);
 
-    IdSet ids() const noexcept;
+    Domain domain() const noexcept;
     State state() const noexcept;
     std::size_t size() const noexcept;
 

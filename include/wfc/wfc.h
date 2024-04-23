@@ -47,7 +47,7 @@ private:
     Result constrain();
     Result propagate();
 
-    std::vector<IdSet> constraining_ids(const IdSet& ids);
+    std::vector<Variable::Domain> constraining_domains(const Variable::Domain& target_domain);
     bool resolved();
 };
 

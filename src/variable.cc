@@ -6,32 +6,32 @@
 namespace wfc {
 
 Variable::Variable()
-    : m_ids()
+    : m_domain()
 {}
 
-Variable::Variable(IdSet&& supports)
-    : m_ids(std::move(supports))
+Variable::Variable(Domain&& domain)
+    : m_domain(std::move(domain))
 {}
 
 void Variable::assign(Id id) {
-    m_ids.clear();
-    m_ids.set(id);
+    m_domain.clear();
+    m_domain.set(id);
 }
 
 void Variable::remove(Id id) {
-    m_ids.unset(id);
+    m_domain.unset(id);
 }
 
-bool Variable::constrain_to(const IdSet& allowed) {
-    const auto size_before = m_ids.size();
-    m_ids.intersect_with(allowed);
+bool Variable::constrain_to(const Domain& allowed) {
+    const auto size_before = m_domain.size();
+    m_domain.intersect_with(allowed);
 
-    const auto size_after = m_ids.size();
+    const auto size_after = m_domain.size();
     return size_before != size_after;
 }
 
-IdSet Variable::ids() const noexcept {
-    return m_ids;
+Variable::Domain Variable::domain() const noexcept {
+    return m_domain;
 }
 
 Variable::State Variable::state() const noexcept {
@@ -47,11 +47,11 @@ Variable::State Variable::state() const noexcept {
 }
 
 std::size_t Variable::size() const noexcept {
-    return m_ids.size();
+    return m_domain.size();
 }
 
 bool Variable::operator==(const Variable& other) const {
-    return m_ids == other.m_ids;
+    return m_domain == other.m_domain;
 }
 
 } // namespace wfc

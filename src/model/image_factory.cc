@@ -76,7 +76,7 @@ std::shared_ptr<Image> ImageFactory::make_image(
 
         for (auto& [id, pattern] : patterns) {
             std::ignore = pattern;
-            constraints.emplace_back(constraint_offsets, IdSet(patterns.size(), false));
+            constraints.emplace_back(constraint_offsets, Variable::Domain(patterns.size(), false));
         }
 
         return constraints;

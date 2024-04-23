@@ -12,7 +12,7 @@ namespace wfc::heuristic::interface {
 class Assignment {
 public:
     virtual ~Assignment() {};
-    virtual std::optional<Id> assign_from(const IdSet& ids) = 0;
+    virtual std::optional<Id> assign_from(const Variable::Domain& domain) = 0;
 };
 
 } // namespace wfc::heuristic::interface

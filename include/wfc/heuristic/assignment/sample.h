@@ -19,7 +19,7 @@ public:
         std::shared_ptr<io::Random> random
     );
 
-    std::optional<Id> assign_from(const IdSet& ids) override;
+    std::optional<Id> assign_from(const Variable::Domain& domain) override;
 };
 
 } // namespace wfc::heuristic::assignment 

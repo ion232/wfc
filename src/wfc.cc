@@ -44,7 +44,7 @@ Wfc::Result Wfc::constrain() {
     }
 
     auto& variable = m_variables[*index];
-    auto id = m_config.assignment_heuristic->assign_from(variable.ids());
+    auto id = m_config.assignment_heuristic->assign_from(variable.domain());
 
     if (!id) {
         return Result::InvalidAssignment;
@@ -62,7 +62,7 @@ Wfc::Result Wfc::propagate() {
     while (!m_propagation_stack.empty()) {
         const auto& current_index = m_propagation_stack.top();
         auto& current_variable = m_variables[current_index];
-        auto possible_ids = constraining_ids(current_variable.ids());
+        auto possible_domains = constraining_domains(current_variable.domain());
         auto offset_indices = m_variables.indices_at_offsets_from(current_index);
 
         m_propagation_stack.pop();
@@ -76,7 +76,7 @@ Wfc::Result Wfc::propagate() {
 
             auto& variable = m_variables[*index];
 
-            if (auto changed = variable.constrain_to(possible_ids[i]); changed) {
+            if (auto changed = variable.constrain_to(possible_domains[i]); changed) {
                 const auto state = variable.state();
 
                 if (state == Variable::State::Invalid) {
@@ -94,21 +94,21 @@ Wfc::Result Wfc::propagate() {
     return Result::Ok;
 }
 
-std::vector<IdSet> Wfc::constraining_ids(const IdSet& domain_ids) {
-    auto constraining_ids = std::vector<IdSet>(
+std::vector<Variable::Domain> Wfc::constraining_domains(const Variable::Domain& target_domain) {
+    auto domains = std::vector<Variable::Domain>(
         m_config.model->constraint_offsets(),
-        IdSet(domain_ids.capacity(), false)
+        Variable::Domain(target_domain.capacity(), false)
     );
 
-    for (const auto& id : domain_ids) {
+    for (const auto& id : target_domain) {
         const auto& constraints_for_id = m_config.model->constraints(id);
 
         for (std::size_t i = 0; i < constraints_for_id.size(); i++) {
-            constraining_ids[i].union_with(constraints_for_id[i]);
+            domains[i].union_with(constraints_for_id[i]);
         }
     }
 
-    return constraining_ids;
+    return domains;
 }
 
 bool Wfc::resolved() {

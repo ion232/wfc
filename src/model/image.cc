@@ -36,8 +36,8 @@ const Image::Patterns& Image::patterns() const noexcept {
 }
 
 data::Tensor<Variable> Image::make_variables(const std::vector<data::Dimension>& dimensions) {
-    auto id_set = IdSet(m_patterns.size(), true);
-    auto variable = Variable(std::move(id_set));
+    auto domain = Variable::Domain(m_patterns.size(), true);
+    auto variable = Variable(std::move(domain));
     auto tensor = data::Tensor<Variable>(dimensions, std::move(variable));
 
     return tensor;
@@ -47,23 +47,23 @@ std::vector<image::Pixel> Image::make_pixels(
     const data::Tensor<Variable>& variables) {
     static const auto make_pixel = [this](const auto& variable){
         const auto state = variable.state();
-        const auto ids = variable.ids();
+        const auto domain = variable.domain();
 
         if (state == Variable::State::Decided) {
-            const auto id = *ids.begin();
+            const auto id = *domain.begin();
             const auto pixel = m_patterns.at(id).value();
             return pixel;
         } else if (state == Variable::State::Undecided) {
             static constexpr auto max_byte = std::numeric_limits<image::Byte>::max();
 
-            const auto domain_size = ids.size();
+            const auto domain_size = domain.size();
 
             auto r = std::uint32_t(0);
             auto g = std::uint32_t(0);
             auto b = std::uint32_t(0);
             auto a = static_cast<image::Byte>((variable.size() * max_byte) / domain_size);
 
-            for (const auto& id : ids) {
+            for (const auto& id : domain) {
                 const auto pixel = m_patterns.at(id).value();
                 r += pixel.r;
                 g += pixel.g;

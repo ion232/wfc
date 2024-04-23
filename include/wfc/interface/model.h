@@ -12,7 +12,7 @@ namespace wfc::model::interface {
 
 class Model {
 public:
-    using Constraints = std::vector<IdSet>;
+    using Constraints = std::vector<Variable::Domain>;
     using Weights = IdMap<std::size_t>;
 
     virtual ~Model() {};

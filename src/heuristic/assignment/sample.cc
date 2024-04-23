@@ -12,10 +12,10 @@ Sample::Sample(
     , m_random(std::move(random))
 {}
 
-std::optional<Id> Sample::assign_from(const IdSet& ids) {
-    const auto weights = m_weights->of(ids);
+std::optional<Id> Sample::assign_from(const Variable::Domain& domain) {
+    const auto weights = m_weights->of(domain);
     const auto random_index = m_random->sample_index(weights);
-    auto it = ids.begin();
+    auto it = domain.begin();
 
     for (std::size_t i = 0; i < random_index; i++) {
         it++;
