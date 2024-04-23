@@ -1,5 +1,5 @@
 #include "benchmark.h"
-#include "components.h"
+#include "wfc_factory.h"
 
 #include <chrono>
 #include <iostream>
@@ -8,12 +8,12 @@
 
 namespace app {
 
-Benchmark::Benchmark(const std::filesystem::path& path)
-    : m_image_path(path)
+Benchmark::Benchmark(WfcFactory&& wfc_factory)
+    : m_wfc_factory(std::move(wfc_factory))
 {}
 
 void Benchmark::run(const std::vector<Parameters>& parameters_list) {
-    std::cout << "Image: " << m_image_path << std::endl;
+    std::cout << "Image: " << m_wfc_factory.image_path() << std::endl;
 
     for (const auto& parameters : parameters_list) {
         std::cout << "Width: " << parameters.width << " ";
@@ -33,7 +33,8 @@ void Benchmark::run(const std::vector<Parameters>& parameters_list) {
 std::optional<std::chrono::milliseconds> Benchmark::solve_time(const Parameters& parameters) {
     using namespace std::chrono;
 
-    auto [wfc, image] = make_components(m_image_path, parameters.width, parameters.height);
+    auto wfc = m_wfc_factory.make_wfc(parameters.width, parameters.height);
+    auto image = m_wfc_factory.image_model();
 
     const auto start = steady_clock::now();
     auto wfc_result = wfc.step();

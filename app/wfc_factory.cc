@@ -1,30 +1,28 @@
-#include "components.h"
 #include "png_loader.h"
+#include "wfc_factory.h"
 
 #include "wfc/model/image_factory.h"
 #include "wfc/model/preconstrainer.h"
 #include "wfc/heuristic/assignment/sample.h"
 #include "wfc/heuristic/choice/entropy.h"
 
-#include <cstddef>
-#include <filesystem>
-#include <utility>
-
 namespace app {
 
-Components make_components(
-    const std::filesystem::path& image_path,
-    std::size_t width,
-    std::size_t height
-)
+WfcFactory::WfcFactory(const std::filesystem::path& image_path)
+    : m_image_path(image_path)
+    , m_image_model(nullptr)
 {
-    auto image = [&image_path](){
+    m_image_model = [&image_path = m_image_path](){
         auto png_loader = std::make_shared<app::PngLoader>();
         auto image_factory = wfc::model::ImageFactory(png_loader);
         auto pattern_dimensions = std::vector<wfc::data::Dimension>({3, 3});
         auto result = image_factory.make_image(image_path, pattern_dimensions);
         return result;
     }();
+}
+
+wfc::Wfc WfcFactory::make_wfc(std::size_t width, std::size_t height) {
+    auto image = m_image_model;
 
     auto config = [&image](){
         auto random = std::make_shared<wfc::io::Random>();
@@ -35,7 +33,7 @@ Components make_components(
         return result;
     }();
 
-    auto preconstraints = [&width, &height, &image_path](){
+    auto preconstraints = [&width, &height, &image_path = m_image_path](){
         auto result = wfc::model::Preconstrainer();
 
         if (image_path.filename() != "flowers.png") {
@@ -65,9 +63,16 @@ Components make_components(
     }();
 
     auto wfc = wfc::Wfc(std::move(config), std::move(tensor));
-    auto components = std::make_pair(std::move(wfc), std::move(image));
 
-    return components;
+    return wfc;
+}
+
+std::filesystem::path WfcFactory::image_path() const noexcept {
+    return m_image_path;
+}
+
+std::shared_ptr<wfc::model::Image> WfcFactory::image_model() const noexcept {
+    return m_image_model;
 }
 
 } // namespace app

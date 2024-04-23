@@ -1,22 +1,24 @@
 #pragma once
 
-#include "components.h"
 #include "wfc/wfc.h"
 #include "wfc/model/image.h"
+#include "wfc_factory.h"
+
+#include <SDL3/SDL.h>
 
 namespace app {
 
 class Gui {
 private:
-    wfc::Wfc m_wfc;
-    std::shared_ptr<wfc::model::Image> m_image_model;
+    WfcFactory m_wfc_factory;
 
 public:
-    Gui(wfc::Wfc&& wfc, std::shared_ptr<wfc::model::Image> image_model);
+    Gui(WfcFactory&& wfc);
 
-    int run();
+    int run(std::size_t width, std::size_t height);
+
+private:
+    bool solve(SDL_Window* window);
 };
-
-Gui make_gui(Components&& components);
 
 } // namespace app
